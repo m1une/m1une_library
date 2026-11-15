@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
+  - icon: ':warning:'
+    path: examples/stress/gen.cpp
+    title: examples/stress/gen.cpp
   - icon: ':heavy_check_mark:'
     path: utilities/random_testing.hpp
     title: Random Testing
@@ -359,16 +362,17 @@ data:
   path: utilities/random.hpp
   requiredBy:
   - utilities/random_testing.hpp
+  - examples/stress/gen.cpp
   timestamp: '2026-07-01 22:42:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/heuristic/simulated_annealing.test.cpp
   - verify/heuristic/hill_climbing.test.cpp
+  - verify/heuristic/simulated_annealing.test.cpp
   - verify/heuristic/beam_search.test.cpp
-  - verify/utilities/random_testing.test.cpp
-  - verify/utilities/random_generators.test.cpp
   - verify/utilities/basic_utilities.test.cpp
+  - verify/utilities/random_generators.test.cpp
   - verify/utilities/grid_transform.test.cpp
+  - verify/utilities/random_testing.test.cpp
 documentation_of: utilities/random.hpp
 layout: document
 title: Random

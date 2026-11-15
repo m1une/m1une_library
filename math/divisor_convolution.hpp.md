@@ -129,8 +129,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/divisor_convolution.test.cpp
-  - verify/math/lcm_convolution.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/lcm_convolution.test.cpp
 documentation_of: math/divisor_convolution.hpp
 layout: document
 title: Divisor Convolution

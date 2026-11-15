@@ -222,27 +222,27 @@ data:
   isVerificationFile: false
   path: convex/monge/smawk.hpp
   requiredBy:
-  - convex/monge_shortest_path.hpp
-  - convex/monge/all.hpp
-  - convex/min_plus_convolution.hpp
+  - convex/all.hpp
+  - convex/all.hpp
   - convex/monge_transition.hpp
-  - convex/all.hpp
-  - convex/all.hpp
+  - convex/monge_shortest_path.hpp
+  - convex/min_plus_convolution.hpp
+  - convex/monge/all.hpp
   timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/monge_dp_optimization.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
-  - verify/convex/monge/monge_algorithms.test.cpp
-  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/min_plus_convolution_convex_convex.test.cpp
+  - verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
+  - verify/convex/max_plus_convolution_concave_concave.test.cpp
+  - verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
   - verify/convex/monge/anti_monge_shortest_path.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_shortest_path.test.cpp
   - verify/convex/monge/ordered_matrix.test.cpp
   - verify/convex/monge/ordered_matrix.test.cpp
-  - verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
-  - verify/convex/max_plus_convolution_concave_concave.test.cpp
-  - verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
-  - verify/convex/min_plus_convolution_convex_convex.test.cpp
 documentation_of: convex/monge/smawk.hpp
 layout: document
 title: SMAWK

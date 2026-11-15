@@ -108,8 +108,8 @@ data:
   timestamp: '2026-07-01 14:07:14+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/matroid/matroids.test.cpp
   - verify/matroid/matroid_intersection.test.cpp
+  - verify/matroid/matroids.test.cpp
 documentation_of: matroid/matroid_intersection.hpp
 layout: document
 title: Matroid Intersection

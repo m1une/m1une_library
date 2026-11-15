@@ -6,6 +6,18 @@ data:
     title: Fast IO
   _extendedRequiredBy:
   - icon: ':warning:'
+    path: examples/stress/brute.cpp
+    title: examples/stress/brute.cpp
+  - icon: ':warning:'
+    path: examples/stress/gen.cpp
+    title: examples/stress/gen.cpp
+  - icon: ':warning:'
+    path: examples/stress/main.cpp
+    title: examples/stress/main.cpp
+  - icon: ':warning:'
+    path: examples/stress/wrong.cpp
+    title: examples/stress/wrong.cpp
+  - icon: ':warning:'
     path: main.cpp
     title: main.cpp
   - icon: ':warning:'
@@ -514,6 +526,10 @@ data:
   requiredBy:
   - pch.hpp
   - main.cpp
+  - examples/stress/wrong.cpp
+  - examples/stress/gen.cpp
+  - examples/stress/main.cpp
+  - examples/stress/brute.cpp
   timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

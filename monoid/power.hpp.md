@@ -64,8 +64,8 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/power.hpp
 layout: document
 title: Monoid Power

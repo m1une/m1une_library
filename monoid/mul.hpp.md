@@ -37,8 +37,8 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/binary_trie/binary_trie_monoid.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/mul.hpp
 layout: document
 title: Multiply Monoid

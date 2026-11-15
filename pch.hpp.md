@@ -9,6 +9,12 @@ data:
     title: Fast IO
   _extendedRequiredBy:
   - icon: ':warning:'
+    path: examples/stress/brute.cpp
+    title: examples/stress/brute.cpp
+  - icon: ':warning:'
+    path: examples/stress/main.cpp
+    title: examples/stress/main.cpp
+  - icon: ':warning:'
     path: main.cpp
     title: main.cpp
   _extendedVerifiedWith: []
@@ -18,12 +24,13 @@ data:
   attributes:
     links:
     - https://zenn.dev/sassan/articles/19db660e4da0a4
-  bundledCode: "Traceback (most recent call last):\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/documentation/build.py\"\
+  bundledCode: "Traceback (most recent call last):\n  File \"/home/runner/.local/lib/python3.14/site-packages/onlinejudge_verify/documentation/build.py\"\
     , line 71, in _render_source_code_stat\n    bundled_code = language.bundle(stat.path,\
     \ basedir=basedir, options={'include_paths': [basedir]}).decode()\n          \
-    \         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\
-    \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus.py\"\
-    , line 187, in bundle\n    bundler.update(path)\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
+    \         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\
+    \  File \"/home/runner/.local/lib/python3.14/site-packages/onlinejudge_verify/languages/cplusplus.py\"\
+    , line 187, in bundle\n    bundler.update(path)\n    ~~~~~~~~~~~~~~^^^^^^\n  File\
+    \ \"/home/runner/.local/lib/python3.14/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
     \ pch.hpp: line 18: unable to process #include in #if / #ifdef / #ifndef other\
@@ -92,6 +99,8 @@ data:
   path: pch.hpp
   requiredBy:
   - main.cpp
+  - examples/stress/main.cpp
+  - examples/stress/brute.cpp
   timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []

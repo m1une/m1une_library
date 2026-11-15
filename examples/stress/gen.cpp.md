@@ -1,0 +1,583 @@
+---
+data:
+  _extendedDependsOn:
+  - icon: ':heavy_check_mark:'
+    path: template.hpp
+    title: template.hpp
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  - icon: ':heavy_check_mark:'
+    path: utilities/random.hpp
+    title: Random
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
+  _isVerificationFailed: false
+  _pathExtension: cpp
+  _verificationStatusIcon: ':warning:'
+  attributes:
+    links: []
+  bundledCode: "#line 1 \"template.hpp\"\n\n\n\n#include <bits/stdc++.h>\n#line 6\
+    \ \"template.hpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 7 \"utilities/fast_io.hpp\"\
+    \n#include <charconv>\n#line 15 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n\
+    #include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    #line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
+    \nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience\
+    \ helpers in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
+    \ s.data() + position, copied);\n            _position += int(copied);\n     \
+    \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
+    \      write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 8 \"template.hpp\"\nusing namespace std;\n\nnamespace m1une\
+    \ {\nnamespace template_io {\n\ninline utilities::FastInput& input() {\n    static\
+    \ utilities::FastInput instance;\n    return instance;\n}\n\ninline utilities::FastOutput&\
+    \ output() {\n    if (auto* instance = utilities::internal::standard_output_instance)\
+    \ {\n        return *instance;\n    }\n    static utilities::FastOutput instance;\n\
+    \    return instance;\n}\n\n}  // namespace template_io\n}  // namespace m1une\n\
+    \nusing ll = long long;\nusing u32 = unsigned int;\nusing u64 = unsigned long\
+    \ long;\nusing i128 = __int128;\nusing u128 = unsigned __int128;\n#ifdef __SIZEOF_FLOAT128__\n\
+    using f128 = __float128;\n#endif\n\ntemplate <class T>\nconstexpr T infty = 0;\n\
+    template <>\nconstexpr int infty<int> = 1'000'000'000;\ntemplate <>\nconstexpr\
+    \ ll infty<ll> = ll(infty<int>) * infty<int> * 2;\ntemplate <>\nconstexpr u32\
+    \ infty<u32> = infty<int>;\ntemplate <>\nconstexpr u64 infty<u64> = infty<ll>;\n\
+    template <>\nconstexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;\ntemplate\
+    \ <>\nconstexpr double infty<double> = infty<ll>;\ntemplate <>\nconstexpr long\
+    \ double infty<long double> = infty<ll>;\n\nusing pi = pair<int, int>;\nusing\
+    \ pl = pair<ll, ll>;\nusing vi = vector<int>;\nusing vl = vector<ll>;\ntemplate\
+    \ <class T>\nusing vc = vector<T>;\ntemplate <class T>\nusing vvc = vector<vc<T>>;\n\
+    using vvi = vvc<int>;\nusing vvl = vvc<ll>;\ntemplate <class T>\nusing vvvc =\
+    \ vector<vvc<T>>;\ntemplate <class T>\nusing vvvvc = vector<vvvc<T>>;\ntemplate\
+    \ <class T>\nusing vvvvvc = vector<vvvvc<T>>;\ntemplate <class T>\nusing pqg =\
+    \ std::priority_queue<T, vector<T>, greater<T>>;\ntemplate <class T, class U>\n\
+    using umap = unordered_map<T, U>;\n\n// template <typename K>\n// using tree =\
+    \ __gnu_pbds::tree<K, __gnu_pbds::null_type, std::less<>,\n//                \
+    \               __gnu_pbds::rb_tree_tag,\n//                               __gnu_pbds::tree_order_statistics_node_update>;\n\
+    \n#define vv(type, name, h, ...) vector<vector<type>> name(h, vector<type>(__VA_ARGS__))\n\
+    #define vvv(type, name, h, w, ...) \\\n    vector<vector<vector<type>>> name(h,\
+    \ vector<vector<type>>(w, vector<type>(__VA_ARGS__)))\n#define vvvv(type, name,\
+    \ a, b, c, ...)         \\\n    vector<vector<vector<vector<type>>>> name( \\\n\
+    \        a, vector<vector<vector<type>>>(b, vector<vector<type>>(c, vector<type>(__VA_ARGS__))))\n\
+    \n#define overload4(a, b, c, d, e, ...) e\n#define overload3(a, b, c, d, ...)\
+    \ d\n\n// FOR(a) :=  for (ll _ = 0; _ < (ll)a; ++_)\n// FOR(i, a) := for (ll i\
+    \ = 0; i < (ll)a; ++i)\n// FOR(i, a, b) := for (ll i = a; i < (ll)b; ++i)\n//\
+    \ FOR(i, a, b, c) := for (ll i = a; i < (ll)b; i += (c))\n// FOR_R(a) := for (ll\
+    \ i = (a) - 1; i >= 0; --i)\n// FOR_R(i, a) := for (ll i = (a) - 1; i >= 0; --i)\n\
+    // FOR_R(i, a, b) := for (ll i = (b) - 1; i >= (ll)a; --i)\n#define FOR1(a) for\
+    \ (ll _ = 0; _ < (ll)a; ++_)\n#define FOR2(i, a) for (ll i = 0; i < (ll)a; ++i)\n\
+    #define FOR3(i, a, b) for (ll i = a; i < (ll)b; ++i)\n#define FOR4(i, a, b, c)\
+    \ for (ll i = a; i < (ll)b; i += (c))\n#define FOR1_R(a) for (ll i = (a) - 1;\
+    \ i >= 0; --i)\n#define FOR2_R(i, a) for (ll i = (a) - 1; i >= 0; --i)\n#define\
+    \ FOR3_R(i, a, b) for (ll i = (b) - 1; i >= (ll)a; --i)\n#define FOR(...) overload4(__VA_ARGS__,\
+    \ FOR4, FOR3, FOR2, FOR1)(__VA_ARGS__)\n#define FOR_R(...) overload3(__VA_ARGS__,\
+    \ FOR3_R, FOR2_R, FOR1_R)(__VA_ARGS__)\n\n#define FORI1(a) for (int _ = 0; _ <\
+    \ (int)a; ++_)\n#define FORI2(i, a) for (int i = 0; i < (int)a; ++i)\n#define\
+    \ FORI3(i, a, b) for (int i = a; i < (int)b; ++i)\n#define FORI4(i, a, b, c) for\
+    \ (int i = a; i < (int)b; i += (c))\n#define FORI1_R(a) for (int i = (a) - 1;\
+    \ i >= 0; --i)\n#define FORI2_R(i, a) for (int i = (a) - 1; i >= 0; --i)\n#define\
+    \ FORI3_R(i, a, b) for (int i = (b) - 1; i >= (int)a; --i)\n#define FORI(...)\
+    \ overload4(__VA_ARGS__, FORI4, FORI3, FORI2, FORI1)(__VA_ARGS__)\n#define FORI_R(...)\
+    \ overload3(__VA_ARGS__, FORI3_R, FORI2_R, FORI1_R)(__VA_ARGS__)\n\n#define FOR_subset(t,\
+    \ s) for (int t = (s); t >= 0; t = (t == 0 ? -1 : (t - 1) & (s)))\n#define all(x)\
+    \ x.begin(), x.end()\n#define rall(x) x.rbegin(), x.rend()\n\nint popcnt(int x)\
+    \ {\n    return __builtin_popcount(x);\n}\nint popcnt(u32 x) {\n    return __builtin_popcount(x);\n\
+    }\nint popcnt(ll x) {\n    return __builtin_popcountll(x);\n}\nint popcnt(u64\
+    \ x) {\n    return __builtin_popcountll(x);\n}\nint popcnt_mod_2(int x) {\n  \
+    \  return __builtin_parity(x);\n}\nint popcnt_mod_2(u32 x) {\n    return __builtin_parity(x);\n\
+    }\nint popcnt_mod_2(ll x) {\n    return __builtin_parityll(x);\n}\nint popcnt_mod_2(u64\
+    \ x) {\n    return __builtin_parityll(x);\n}\n// (0, 1, 2, 3, 4) -> (-1, 0, 1,\
+    \ 1, 2)\nint topbit(int x) {\n    return (x == 0 ? -1 : 31 - __builtin_clz(x));\n\
+    }\nint topbit(u32 x) {\n    return (x == 0 ? -1 : 31 - __builtin_clz(x));\n}\n\
+    int topbit(ll x) {\n    return (x == 0 ? -1 : 63 - __builtin_clzll(x));\n}\nint\
+    \ topbit(u64 x) {\n    return (x == 0 ? -1 : 63 - __builtin_clzll(x));\n}\n//\
+    \ (0, 1, 2, 3, 4) -> (-1, 0, 1, 0, 2)\nint lowbit(int x) {\n    return (x == 0\
+    \ ? -1 : __builtin_ctz(x));\n}\nint lowbit(u32 x) {\n    return (x == 0 ? -1 :\
+    \ __builtin_ctz(x));\n}\nint lowbit(ll x) {\n    return (x == 0 ? -1 : __builtin_ctzll(x));\n\
+    }\nint lowbit(u64 x) {\n    return (x == 0 ? -1 : __builtin_ctzll(x));\n}\n\n\
+    template <typename T>\nT floor(T a, T b) {\n    return a / b - (a % b && (a ^\
+    \ b) < 0);\n}\ntemplate <typename T>\nT ceil(T x, T y) {\n    return floor(x +\
+    \ y - 1, y);\n}\ntemplate <typename T>\nT bmod(T x, T y) {\n    return x - y *\
+    \ floor(x, y);\n}\ntemplate <typename T>\npair<T, T> divmod(T x, T y) {\n    T\
+    \ q = floor(x, y);\n    return {q, x - q * y};\n}\n\ntemplate <typename T, typename\
+    \ U>\nT POW(U x_, int n) {\n    T x = x_;\n    T ret = 1;\n    while (n > 0) {\n\
+    \        if (n & 1) ret *= x;\n        x *= x;\n        n >>= 1;\n    }\n    return\
+    \ ret;\n}\n\ntemplate <typename T, typename U>\nT SUM(const vector<U>& A) {\n\
+    \    T sm = 0;\n    for (auto&& a : A) sm += a;\n    return sm;\n}\n\n#define\
+    \ LB(c, x) distance((c).begin(), lower_bound(all(c), (x)))\n#define UB(c, x) distance((c).begin(),\
+    \ upper_bound(all(c), (x)))\n#define UNIQUE(x) sort(all(x)), x.erase(unique(all(x)),\
+    \ x.end()), x.shrink_to_fit()\n\ntemplate <class T, class S>\ninline bool chmax(T&\
+    \ a, const S& b) {\n    return (a < b ? a = b, 1 : 0);\n}\ntemplate <class T,\
+    \ class S>\ninline bool chmin(T& a, const S& b) {\n    return (a > b ? a = b,\
+    \ 1 : 0);\n}\n\n// ? \u306F -1\nvc<int> s_to_vi(const string& S, char first_char)\
+    \ {\n    vc<int> A(S.size());\n    FOR(i, S.size()) {\n        A[i] = (S[i] !=\
+    \ '?' ? S[i] - first_char : -1);\n    }\n    return A;\n}\n\ntemplate <typename\
+    \ T, typename U>\nvector<T> cumsum(vector<U>& A, int off = 1) {\n    int N = A.size();\n\
+    \    vector<T> B(N + 1);\n    FOR(i, N) {\n        B[i + 1] = B[i] + A[i];\n \
+    \   }\n    if (off == 0) B.erase(B.begin());\n    return B;\n}\n\ntemplate <typename\
+    \ T>\nvector<int> argsort(const vector<T>& A) {\n    vector<int> ids(A.size());\n\
+    \    iota(all(ids), 0);\n    sort(all(ids), [&](int i, int j) { return (A[i] ==\
+    \ A[j] ? i < j : A[i] < A[j]); });\n    return ids;\n}\n\n// A[I[0]], A[I[1]],\
+    \ ...\ntemplate <typename T>\nvc<T> rearrange(const vc<T>& A, const vc<int>& I)\
+    \ {\n    vc<T> B(I.size());\n    FOR(i, I.size()) B[i] = A[I[i]];\n    return\
+    \ B;\n}\n\ntemplate <class... T>\nconstexpr auto min(T... a) {\n    return min(initializer_list<common_type_t<T...>>{a...});\n\
+    }\ntemplate <class... T>\nconstexpr auto max(T... a) {\n    return max(initializer_list<common_type_t<T...>>{a...});\n\
+    }\n\ntemplate <class... Ts>\nbool scan(Ts&... values) {\n    return m1une::template_io::input().read(values...);\n\
+    }\n\ntemplate <class... Ts>\nvoid print(const Ts&... values) {\n    m1une::template_io::output().println(values...);\n\
+    }\ntemplate <class Matrix>\nvoid print_aligned(const Matrix& matrix) {\n    m1une::template_io::output().println_aligned(matrix);\n\
+    }\nvoid YESNO(bool b) {\n    m1une::template_io::output().println(b ? \"YES\"\
+    \ : \"NO\");\n}\nvoid YesNo(bool b) {\n    m1une::template_io::output().println(b\
+    \ ? \"Yes\" : \"No\");\n}\nvoid YES() {\n    m1une::template_io::output().println(\"\
+    YES\");\n}\nvoid NO() {\n    m1une::template_io::output().println(\"NO\");\n}\n\
+    void Yes() {\n    m1une::template_io::output().println(\"Yes\");\n}\nvoid No()\
+    \ {\n    m1une::template_io::output().println(\"No\");\n}\nvoid Alice() {\n  \
+    \  m1une::template_io::output().println(\"Alice\");\n}\nvoid Bob() {\n    m1une::template_io::output().println(\"\
+    Bob\");\n}\n\n#line 1 \"utilities/random.hpp\"\n\n\n\n#line 7 \"utilities/random.hpp\"\
+    \n#include <concepts>\n#line 14 \"utilities/random.hpp\"\n#include <string_view>\n\
+    #line 20 \"utilities/random.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
+    \nstruct RandomGraphOptions {\n    bool directed = false;\n    bool allow_self_loops\
+    \ = false;\n    bool allow_parallel_edges = false;\n};\n\nstruct Random {\n  \
+    \ private:\n    std::mt19937_64 _engine;\n\n    static unsigned long long chrono_seed()\
+    \ {\n        return static_cast<unsigned long long>(\n            std::chrono::steady_clock::now().time_since_epoch().count());\n\
+    \    }\n\n    static std::uint64_t graph_edge_count(int vertex_count,\n      \
+    \                                    const RandomGraphOptions& options) {\n  \
+    \      std::uint64_t n = static_cast<unsigned int>(vertex_count);\n        if\
+    \ (options.directed) {\n            return options.allow_self_loops ? n * n :\
+    \ n * (n - 1);\n        }\n        return options.allow_self_loops ? n * (n +\
+    \ 1) / 2 : n * (n - 1) / 2;\n    }\n\n    static std::pair<int, int> decode_graph_edge(\n\
+    \        std::uint64_t index, int vertex_count,\n        const RandomGraphOptions&\
+    \ options) {\n        std::uint64_t n = static_cast<unsigned int>(vertex_count);\n\
+    \        if (options.directed) {\n            std::uint64_t width = options.allow_self_loops\
+    \ ? n : n - 1;\n            int from = int(index / width);\n            int offset\
+    \ = int(index % width);\n            int to = options.allow_self_loops || offset\
+    \ < from ? offset : offset + 1;\n            return {from, to};\n        }\n\n\
+    \        auto prefix = [&](std::uint64_t vertex) {\n            if (options.allow_self_loops)\
+    \ {\n                return vertex * (2 * n - vertex + 1) / 2;\n            }\n\
+    \            return vertex * (2 * n - vertex - 1) / 2;\n        };\n        std::uint64_t\
+    \ low = 0;\n        std::uint64_t high = n;\n        while (low + 1 < high) {\n\
+    \            std::uint64_t middle = (low + high) / 2;\n            if (prefix(middle)\
+    \ <= index) {\n                low = middle;\n            } else {\n         \
+    \       high = middle;\n            }\n        }\n        int from = int(low);\n\
+    \        int to = from + int(index - prefix(low)) +\n                 (options.allow_self_loops\
+    \ ? 0 : 1);\n        return {from, to};\n    }\n\n   public:\n    Random() : _engine(chrono_seed())\
+    \ {}\n    explicit Random(unsigned long long seed) : _engine(seed) {}\n\n    void\
+    \ seed(unsigned long long value) {\n        _engine.seed(value);\n    }\n\n  \
+    \  std::mt19937_64& engine() {\n        return _engine;\n    }\n\n    unsigned\
+    \ long long operator()() {\n        return _engine();\n    }\n\n    long long\
+    \ uniform(long long l, long long r) {\n        return std::uniform_int_distribution<long\
+    \ long>(l, r)(_engine);\n    }\n\n    unsigned long long uniform_unsigned(unsigned\
+    \ long long l, unsigned long long r) {\n        return std::uniform_int_distribution<unsigned\
+    \ long long>(l, r)(_engine);\n    }\n\n    double real(double l = 0.0, double\
+    \ r = 1.0) {\n        return std::uniform_real_distribution<double>(l, r)(_engine);\n\
+    \    }\n\n    template <std::integral T>\n    requires(!std::same_as<std::remove_cv_t<T>,\
+    \ bool>)\n    std::vector<T> sequence(int size, T lower, T upper) {\n        assert(0\
+    \ <= size);\n        assert(lower <= upper);\n        if (size < 0 || upper <\
+    \ lower) return {};\n        std::vector<T> result(size);\n        if constexpr\
+    \ (std::signed_integral<T>) {\n            std::uniform_int_distribution<long\
+    \ long> distribution(\n                static_cast<long long>(lower), static_cast<long\
+    \ long>(upper));\n            for (T& value : result) value = static_cast<T>(distribution(_engine));\n\
+    \        } else {\n            std::uniform_int_distribution<unsigned long long>\
+    \ distribution(\n                static_cast<unsigned long long>(lower),\n   \
+    \             static_cast<unsigned long long>(upper));\n            for (T& value\
+    \ : result) value = static_cast<T>(distribution(_engine));\n        }\n      \
+    \  return result;\n    }\n\n    std::string string(\n        int length,\n   \
+    \     std::string_view alphabet = \"abcdefghijklmnopqrstuvwxyz\") {\n        assert(0\
+    \ <= length);\n        assert(length == 0 || !alphabet.empty());\n        if (length\
+    \ < 0 || (0 < length && alphabet.empty())) return {};\n        std::string result(length,\
+    \ '\\0');\n        for (char& character : result) {\n            character = alphabet[uniform(0,\
+    \ int(alphabet.size()) - 1)];\n        }\n        return result;\n    }\n\n  \
+    \  std::vector<int> permutation(int size, int first = 0) {\n        assert(0 <=\
+    \ size);\n        if (size < 0) return {};\n        std::vector<int> result(size);\n\
+    \        std::iota(result.begin(), result.end(), first);\n        shuffle(result);\n\
+    \        return result;\n    }\n\n    // Returns the edges of a uniformly random\
+    \ labeled tree on [0, size).\n    std::vector<std::pair<int, int>> tree(int size)\
+    \ {\n        assert(0 <= size);\n        if (size <= 1) return {};\n\n       \
+    \ std::vector<int> prufer = sequence(size - 2, 0, size - 1);\n        std::vector<int>\
+    \ degree(size, 1);\n        for (int vertex : prufer) degree[vertex]++;\n    \
+    \    std::priority_queue<int, std::vector<int>, std::greater<int>> leaves;\n \
+    \       for (int vertex = 0; vertex < size; vertex++) {\n            if (degree[vertex]\
+    \ == 1) leaves.push(vertex);\n        }\n\n        std::vector<std::pair<int,\
+    \ int>> edges;\n        edges.reserve(size - 1);\n        for (int vertex : prufer)\
+    \ {\n            int leaf = leaves.top();\n            leaves.pop();\n       \
+    \     edges.emplace_back(leaf, vertex);\n            if (--degree[vertex] == 1)\
+    \ leaves.push(vertex);\n        }\n        int first = leaves.top();\n       \
+    \ leaves.pop();\n        edges.emplace_back(first, leaves.top());\n\n        shuffle(edges);\n\
+    \        for (auto& [from, to] : edges) {\n            if (uniform(0, 1)) std::swap(from,\
+    \ to);\n        }\n        return edges;\n    }\n\n    // Returns m random edges\
+    \ on [0, vertex_count). By default the result is\n    // a simple undirected graph\
+    \ without self-loops.\n    std::vector<std::pair<int, int>> graph(\n        int\
+    \ vertex_count, int edge_count,\n        RandomGraphOptions options = {}) {\n\
+    \        assert(0 <= vertex_count);\n        assert(0 <= edge_count);\n      \
+    \  if (vertex_count < 0 || edge_count < 0) return {};\n        if (edge_count\
+    \ == 0) return {};\n        assert(0 < vertex_count);\n        if (vertex_count\
+    \ == 0) return {};\n        if (!options.allow_self_loops) {\n            assert(2\
+    \ <= vertex_count || edge_count == 0);\n            if (vertex_count < 2) return\
+    \ {};\n        }\n\n        std::vector<std::pair<int, int>> edges;\n        edges.reserve(edge_count);\n\
+    \        if (options.allow_parallel_edges) {\n            for (int edge = 0; edge\
+    \ < edge_count; edge++) {\n                int from = int(uniform(0, vertex_count\
+    \ - 1));\n                int to;\n                if (options.allow_self_loops)\
+    \ {\n                    to = int(uniform(0, vertex_count - 1));\n           \
+    \     } else {\n                    to = int(uniform(0, vertex_count - 2));\n\
+    \                    if (from <= to) to++;\n                }\n              \
+    \  if (!options.directed && to < from) std::swap(from, to);\n                edges.emplace_back(from,\
+    \ to);\n            }\n            return edges;\n        }\n\n        std::uint64_t\
+    \ maximum = graph_edge_count(vertex_count, options);\n        assert(static_cast<std::uint64_t>(edge_count)\
+    \ <= maximum);\n        if (maximum < static_cast<std::uint64_t>(edge_count))\
+    \ return {};\n\n        std::unordered_set<std::uint64_t> selected;\n        selected.reserve(static_cast<std::size_t>(edge_count)\
+    \ * 2 + 1);\n        std::vector<std::uint64_t> indices;\n        indices.reserve(edge_count);\n\
+    \        for (std::uint64_t current = maximum - edge_count;\n             current\
+    \ < maximum; current++) {\n            std::uint64_t candidate = uniform_unsigned(0,\
+    \ current);\n            if (selected.contains(candidate)) candidate = current;\n\
+    \            selected.insert(candidate);\n            indices.push_back(candidate);\n\
+    \        }\n        for (std::uint64_t index : indices) {\n            edges.push_back(decode_graph_edge(index,\
+    \ vertex_count, options));\n        }\n        return edges;\n    }\n\n    std::vector<std::pair<int,\
+    \ int>> directed_graph(\n        int vertex_count, int edge_count,\n        bool\
+    \ allow_self_loops = false) {\n        RandomGraphOptions options;\n        options.allow_self_loops\
+    \ = allow_self_loops;\n        return directed_graph(vertex_count, edge_count,\
+    \ options);\n    }\n\n    std::vector<std::pair<int, int>> directed_graph(\n \
+    \       int vertex_count, int edge_count, RandomGraphOptions options) {\n    \
+    \    options.directed = true;\n        return graph(vertex_count, edge_count,\
+    \ options);\n    }\n\n    // Returns a directed acyclic graph. Vertices are randomly\
+    \ permuted before\n    // every sampled edge is directed forward in that topological\
+    \ order.\n    std::vector<std::pair<int, int>> dag(\n        int vertex_count,\
+    \ int edge_count,\n        RandomGraphOptions options = {}) {\n        options.directed\
+    \ = false;\n        options.allow_self_loops = false;\n        std::vector<std::pair<int,\
+    \ int>> edges =\n            graph(vertex_count, edge_count, options);\n     \
+    \   std::vector<int> order = permutation(vertex_count);\n        for (auto& [from,\
+    \ to] : edges) {\n            from = order[from];\n            to = order[to];\n\
+    \        }\n        return edges;\n    }\n\n    template <std::integral Weight>\n\
+    \    requires(!std::same_as<std::remove_cv_t<Weight>, bool>)\n    std::vector<std::tuple<int,\
+    \ int, Weight>> weighted_tree(\n        int size, Weight lower, Weight upper)\
+    \ {\n        std::vector<std::pair<int, int>> edges = tree(size);\n        std::vector<Weight>\
+    \ weights = sequence(int(edges.size()), lower, upper);\n        std::vector<std::tuple<int,\
+    \ int, Weight>> result;\n        result.reserve(edges.size());\n        for (int\
+    \ index = 0; index < int(edges.size()); index++) {\n            result.emplace_back(edges[index].first,\
+    \ edges[index].second,\n                                weights[index]);\n   \
+    \     }\n        return result;\n    }\n\n    template <std::integral Weight>\n\
+    \    requires(!std::same_as<std::remove_cv_t<Weight>, bool>)\n    std::vector<std::tuple<int,\
+    \ int, Weight>> weighted_graph(\n        int vertex_count, int edge_count, Weight\
+    \ lower, Weight upper,\n        RandomGraphOptions options = {}) {\n        std::vector<std::pair<int,\
+    \ int>> edges =\n            graph(vertex_count, edge_count, options);\n     \
+    \   std::vector<Weight> weights = sequence(int(edges.size()), lower, upper);\n\
+    \        std::vector<std::tuple<int, int, Weight>> result;\n        result.reserve(edges.size());\n\
+    \        for (int index = 0; index < int(edges.size()); index++) {\n         \
+    \   result.emplace_back(edges[index].first, edges[index].second,\n           \
+    \                     weights[index]);\n        }\n        return result;\n  \
+    \  }\n\n    template <std::integral Weight>\n    requires(!std::same_as<std::remove_cv_t<Weight>,\
+    \ bool>)\n    std::vector<std::tuple<int, int, Weight>> weighted_directed_graph(\n\
+    \        int vertex_count, int edge_count, Weight lower, Weight upper,\n     \
+    \   bool allow_self_loops = false) {\n        RandomGraphOptions options;\n  \
+    \      options.allow_self_loops = allow_self_loops;\n        return weighted_directed_graph(vertex_count,\
+    \ edge_count, lower, upper,\n                                       options);\n\
+    \    }\n\n    template <std::integral Weight>\n    requires(!std::same_as<std::remove_cv_t<Weight>,\
+    \ bool>)\n    std::vector<std::tuple<int, int, Weight>> weighted_directed_graph(\n\
+    \        int vertex_count, int edge_count, Weight lower, Weight upper,\n     \
+    \   RandomGraphOptions options) {\n        options.directed = true;\n        return\
+    \ weighted_graph(vertex_count, edge_count, lower, upper, options);\n    }\n\n\
+    \    template <std::integral Weight>\n    requires(!std::same_as<std::remove_cv_t<Weight>,\
+    \ bool>)\n    std::vector<std::tuple<int, int, Weight>> weighted_dag(\n      \
+    \  int vertex_count, int edge_count, Weight lower, Weight upper,\n        RandomGraphOptions\
+    \ options = {}) {\n        std::vector<std::pair<int, int>> edges =\n        \
+    \    dag(vertex_count, edge_count, options);\n        std::vector<Weight> weights\
+    \ = sequence(int(edges.size()), lower, upper);\n        std::vector<std::tuple<int,\
+    \ int, Weight>> result;\n        result.reserve(edges.size());\n        for (int\
+    \ index = 0; index < int(edges.size()); index++) {\n            result.emplace_back(edges[index].first,\
+    \ edges[index].second,\n                                weights[index]);\n   \
+    \     }\n        return result;\n    }\n\n    template <typename T>\n    void\
+    \ shuffle(std::vector<T>& v) {\n        std::shuffle(v.begin(), v.end(), _engine);\n\
+    \    }\n\n    template <typename Iterator>\n    void shuffle(Iterator first, Iterator\
+    \ last) {\n        std::shuffle(first, last, _engine);\n    }\n\n    template\
+    \ <typename T>\n    const T& choice(const std::vector<T>& v) {\n        return\
+    \ v[uniform(0, static_cast<long long>(v.size()) - 1)];\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 3 \"examples/stress/gen.cpp\"\n\n\
+    int main(int argc, char** argv) {\n    assert(argc == 2);\n    m1une::utilities::Random\
+    \ random(std::stoull(argv[1]));\n    int n = int(random.uniform(0, 30));\n   \
+    \ print(n);\n    print(random.sequence(n, -5, 5));\n}\n"
+  code: "#include \"template.hpp\"\n#include \"utilities/random.hpp\"\n\nint main(int\
+    \ argc, char** argv) {\n    assert(argc == 2);\n    m1une::utilities::Random random(std::stoull(argv[1]));\n\
+    \    int n = int(random.uniform(0, 30));\n    print(n);\n    print(random.sequence(n,\
+    \ -5, 5));\n}\n"
+  dependsOn:
+  - template.hpp
+  - utilities/fast_io.hpp
+  - utilities/random.hpp
+  isVerificationFile: false
+  path: examples/stress/gen.cpp
+  requiredBy: []
+  timestamp: '2026-11-16 02:40:03+09:00'
+  verificationStatus: LIBRARY_NO_TESTS
+  verifiedWith: []
+documentation_of: examples/stress/gen.cpp
+layout: document
+redirect_from:
+- /library/examples/stress/gen.cpp
+- /library/examples/stress/gen.cpp.html
+title: examples/stress/gen.cpp
+---

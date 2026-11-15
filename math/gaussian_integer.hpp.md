@@ -281,8 +281,8 @@ data:
   timestamp: '2026-08-24 03:45:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/gcd_of_gaussian_integers.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/gcd_of_gaussian_integers.test.cpp
 documentation_of: math/gaussian_integer.hpp
 layout: document
 title: Gaussian Integer

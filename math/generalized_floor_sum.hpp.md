@@ -295,8 +295,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/yukicoder_2362.test.cpp
-  - verify/math/generalized_floor_sum.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/generalized_floor_sum.test.cpp
 documentation_of: math/generalized_floor_sum.hpp
 layout: document
 title: Generalized Floor Sum

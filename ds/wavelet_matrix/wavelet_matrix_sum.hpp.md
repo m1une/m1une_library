@@ -493,8 +493,8 @@ data:
   timestamp: '2026-07-19 01:44:04+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/static_rectangle_sum.test.cpp
   - verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
+  - verify/ds/range_query/static_rectangle_sum.test.cpp
 documentation_of: ds/wavelet_matrix/wavelet_matrix_sum.hpp
 layout: document
 title: Wavelet Matrix with Sums

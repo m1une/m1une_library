@@ -254,8 +254,8 @@ data:
   timestamp: '2026-06-24 14:35:02+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/tetration.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/tetration.test.cpp
 documentation_of: math/tetration.hpp
 layout: document
 title: Tetration

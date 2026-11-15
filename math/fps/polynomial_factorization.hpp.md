@@ -1108,14 +1108,14 @@ data:
   isVerificationFile: false
   path: math/fps/polynomial_factorization.hpp
   requiredBy:
-  - math/fps/all.hpp
   - math/all.hpp
+  - math/fps/all.hpp
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/polynomial_factorization.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
 documentation_of: math/fps/polynomial_factorization.hpp
 layout: document
 title: Polynomial Factorization

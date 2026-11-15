@@ -383,9 +383,9 @@ data:
   timestamp: '2026-10-05 22:23:07+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/stern_brocot_tree.test.cpp
-  - verify/math/yosupo_stern_brocot_tree.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/yosupo_stern_brocot_tree.test.cpp
+  - verify/math/stern_brocot_tree.test.cpp
 documentation_of: math/stern_brocot_tree.hpp
 layout: document
 title: Stern-Brocot Tree

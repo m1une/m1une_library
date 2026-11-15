@@ -205,6 +205,9 @@ data:
     - icon: ':warning:'
       path: pch.hpp
       title: pch.hpp
+    - icon: ':warning:'
+      path: stress.py
+      title: stress.py
     - icon: ':heavy_check_mark:'
       path: template.hpp
       title: template.hpp
@@ -589,6 +592,20 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
       title: Wavelet Matrix with Sums
+  - name: examples/stress
+    pages:
+    - icon: ':warning:'
+      path: examples/stress/brute.cpp
+      title: examples/stress/brute.cpp
+    - icon: ':warning:'
+      path: examples/stress/gen.cpp
+      title: examples/stress/gen.cpp
+    - icon: ':warning:'
+      path: examples/stress/main.cpp
+      title: examples/stress/main.cpp
+    - icon: ':warning:'
+      path: examples/stress/wrong.cpp
+      title: examples/stress/wrong.cpp
   - name: game
     pages:
     - icon: ':heavy_check_mark:'
@@ -1463,6 +1480,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: utilities/detail/fixed_int.hpp
       title: utilities/detail/fixed_int.hpp
+  - name: verify/utilities
+    pages:
+    - icon: ':warning:'
+      path: verify/utilities/stress_test.py
+      title: verify/utilities/stress_test.py
   verificationCategories:
   - name: verify/acted_monoid
     pages:

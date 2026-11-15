@@ -75,8 +75,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/matroid/weighted_matroid_intersection.test.cpp
-  - verify/matroid/matroids.test.cpp
   - verify/matroid/matroid_intersection.test.cpp
+  - verify/matroid/matroids.test.cpp
 documentation_of: matroid/partition_matroid.hpp
 layout: document
 title: Partition Matroid

@@ -98,8 +98,8 @@ data:
   timestamp: '2026-06-24 21:43:10+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/sum_of_totient_function.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/sum_of_totient_function.test.cpp
 documentation_of: math/totient_sum.hpp
 layout: document
 title: Totient Sum

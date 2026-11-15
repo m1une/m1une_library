@@ -69,8 +69,8 @@ data:
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/sequence/sequence_algorithms.test.cpp
   - verify/algo/sequence/longest_increasing_subsequence.test.cpp
+  - verify/algo/sequence/sequence_algorithms.test.cpp
 documentation_of: algo/sequence/lis.hpp
 layout: document
 title: Longest Increasing Subsequence (LIS)

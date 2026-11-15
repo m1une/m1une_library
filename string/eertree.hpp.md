@@ -189,8 +189,8 @@ data:
   timestamp: '2026-06-23 11:42:02+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/palindrome_lexicographical_order.test.cpp
   - verify/string/eertree.test.cpp
+  - verify/string/palindrome_lexicographical_order.test.cpp
   - verify/string/string_algorithms.test.cpp
 documentation_of: string/eertree.hpp
 layout: document

@@ -8,6 +8,9 @@ data:
   - icon: ':warning:'
     path: algo/sequence/all.hpp
     title: Sequence Algorithms All
+  - icon: ':warning:'
+    path: examples/stress/main.cpp
+    title: examples/stress/main.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/algo/sequence/sequence_algorithms.test.cpp
@@ -55,6 +58,7 @@ data:
   requiredBy:
   - algo/sequence/all.hpp
   - algo/all.hpp
+  - examples/stress/main.cpp
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

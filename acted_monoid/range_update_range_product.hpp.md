@@ -105,8 +105,8 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_update_range_product.hpp
 layout: document
 title: Range Update Range Product
