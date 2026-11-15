@@ -194,6 +194,21 @@ unconditional, so use this mode only after expanding the source and only when
 all of its included headers are valid on the target judge. Run and test the
 ordinary build before relying on the assertion-free output.
 
+## Contest Stress Testing
+
+Keep your normal solution in `main.cpp`, write `brute.cpp`, and have `gen.cpp`
+print one input using `Random(std::stoull(argv[1]))`. From the contest directory:
+
+```sh
+python3 /Users/Reito/Desktop/atcoder/m1une_library/stress.py --seed 42 --cases 1000
+```
+
+The runner compiles with C++23 and GCC 16 on your Mac, works with the normal
+`FastInput`/`FastOutput` template, and reports mismatches, crashes, and timeouts.
+Failures include input, both outputs, seeds, saved files, and a replay command.
+See the [stress-testing guide](https://m1une.github.io/m1une_library/utilities/random_testing.hpp)
+for a complete example, options, and the existing faster function-level helpers.
+
 ## Documentation Conventions
 
 * Ranges are half-open: `[l, r)` includes `l` and excludes `r`.

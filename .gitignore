@@ -7,3 +7,5 @@
 combined.cpp
 in.txt
 *.gch
+stress-failure-*/
+__pycache__/
