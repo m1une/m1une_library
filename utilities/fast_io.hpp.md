@@ -52,6 +52,9 @@ data:
     path: verify/algo/offline/mo.test.cpp
     title: verify/algo/offline/mo.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/algo/offline/mo_with_updates.test.cpp
+    title: verify/algo/offline/mo_with_updates.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/algo/offline/parallel_binary_search.test.cpp
     title: verify/algo/offline/parallel_binary_search.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1941,6 +1944,7 @@ data:
   - verify/algo/offline/mo.test.cpp
   - verify/algo/offline/cdq_divide_and_conquer.test.cpp
   - verify/algo/offline/parallel_binary_search.test.cpp
+  - verify/algo/offline/mo_with_updates.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/matroid/weighted_matroid_intersection.test.cpp
   - verify/matroid/matroid_intersection.test.cpp

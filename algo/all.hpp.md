@@ -38,6 +38,9 @@ data:
     path: algo/offline/mo.hpp
     title: Mo's Algorithm
   - icon: ':heavy_check_mark:'
+    path: algo/offline/mo_with_updates.hpp
+    title: Mo's Algorithm with Updates
+  - icon: ':heavy_check_mark:'
     path: algo/offline/parallel_binary_search.hpp
     title: Parallel Binary Search
   - icon: ':warning:'
@@ -393,7 +396,78 @@ data:
     \ independent of\n    // which side moves.\n    template <class Add, class Remove,\
     \ class Answer>\n    void run(Add add, Remove remove, Answer answer, int block_size\
     \ = 0) const {\n        run(add, add, remove, remove, answer, block_size);\n \
-    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/offline/parallel_binary_search.hpp\"\
+    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/offline/mo_with_updates.hpp\"\
+    \n\n\n\n#line 10 \"algo/offline/mo_with_updates.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ algo {\n\n// Offline Mo ordering in (left, right, update time). Array values\
+    \ and the\n// before/after values of each point update are owned by the caller.\n\
+    struct MoWithUpdates {\n    struct Query {\n        int left;\n        int right;\n\
+    \        int time;\n        int id;\n    };\n\n   private:\n    int _n;\n    int\
+    \ _update_count = 0;\n    std::vector<Query> _queries;\n\n   public:\n    MoWithUpdates()\
+    \ : _n(0) {}\n\n    explicit MoWithUpdates(int n) : _n(n) { assert(0 <= n); }\n\
+    \n    int size() const { return _n; }\n\n    int query_count() const { return\
+    \ int(_queries.size()); }\n\n    int update_count() const { return _update_count;\
+    \ }\n\n    bool empty() const { return _queries.empty(); }\n\n    const std::vector<Query>&\
+    \ queries() const { return _queries; }\n\n    void reserve(int query_capacity)\
+    \ {\n        assert(0 <= query_capacity);\n        _queries.reserve(query_capacity);\n\
+    \    }\n\n    void clear() {\n        _queries.clear();\n        _update_count\
+    \ = 0;\n    }\n\n    // Registers one update and returns its zero-based ID. Time\
+    \ t means that\n    // updates [0, t) have been applied, including any no-op assignments.\n\
+    \    int add_update() {\n        assert(_update_count < std::numeric_limits<int>::max());\n\
+    \        return _update_count++;\n    }\n\n    int add_query(int left, int right)\
+    \ { return add_query(left, right, _update_count); }\n\n    // Historical times\
+    \ are allowed, but the updates must already be registered.\n    int add_query(int\
+    \ left, int right, int time) {\n        assert(0 <= left && left <= right && right\
+    \ <= _n);\n        assert(0 <= time && time <= _update_count);\n        assert(_queries.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        const int id = query_count();\n\
+    \        _queries.push_back(Query{left, right, time, id});\n        return id;\n\
+    \    }\n\n    std::vector<int> order(int block_size = 0) const {\n        const\
+    \ int q = query_count();\n        if (q == 0) return {};\n        auto times =\
+    \ std::minmax_element(_queries.begin(), _queries.end(),\n            [](const\
+    \ Query& a, const Query& b) { return a.time < b.time; });\n        const int time_span\
+    \ = times.second->time - times.first->time;\n        if (block_size <= 0) {\n\
+    \            const double n = _n;\n            const double static_size = n /\
+    \ std::sqrt(double(q));\n            const double dynamic_size = std::cbrt(n *\
+    \ n * double(time_span) / double(q));\n            const double estimate = std::max(static_size,\
+    \ dynamic_size);\n            block_size = int(std::clamp(estimate, 1.0, double(std::max(1,\
+    \ _n))));\n        }\n\n        struct Entry {\n            int left_block;\n\
+    \            int right_block;\n            int time;\n            int id;\n  \
+    \      };\n        std::vector<Entry> entries;\n        entries.reserve(q);\n\
+    \        for (const Query& query : _queries) {\n            entries.push_back(Entry{\n\
+    \                query.left / block_size, query.right / block_size, query.time,\
+    \ query.id});\n        }\n        std::sort(entries.begin(), entries.end(), [&](const\
+    \ Entry& a, const Entry& b) {\n            if (a.left_block != b.left_block) return\
+    \ a.left_block < b.left_block;\n            const bool reverse_right = (a.left_block\
+    \ & 1) != 0;\n            if (time_span != 0) {\n                if (a.right_block\
+    \ != b.right_block) {\n                    return reverse_right ? a.right_block\
+    \ > b.right_block : a.right_block < b.right_block;\n                }\n      \
+    \          if (a.time != b.time) {\n                    return ((a.left_block\
+    \ ^ a.right_block) & 1) ? a.time > b.time : a.time < b.time;\n               \
+    \ }\n            }\n            const int a_right = _queries[a.id].right;\n  \
+    \          const int b_right = _queries[b.id].right;\n            if (a_right\
+    \ != b_right) return reverse_right ? a_right > b_right : a_right < b_right;\n\
+    \            return a.id < b.id;\n        });\n        std::vector<int> result;\n\
+    \        result.reserve(q);\n        for (const Entry& entry : entries) result.push_back(entry.id);\n\
+    \        return result;\n    }\n\n    // apply(id, left, right) moves time id\
+    \ -> id + 1; undo(id, left, right)\n    // reverses that update. Both must update\
+    \ the array even outside the active\n    // range, and must repair the maintained\
+    \ answer when necessary inside it.\n    template <class AddLeft, class AddRight,\
+    \ class RemoveLeft, class RemoveRight,\n              class Apply, class Undo,\
+    \ class Answer>\n    void run(AddLeft add_left, AddRight add_right, RemoveLeft\
+    \ remove_left, RemoveRight remove_right,\n             Apply apply, Undo undo,\
+    \ Answer answer, int block_size = 0) const {\n        int left = 0;\n        int\
+    \ right = 0;\n        int time = 0;\n        for (int query_index : order(block_size))\
+    \ {\n            const Query& query = _queries[query_index];\n            while\
+    \ (time < query.time) {\n                apply(time, left, right);\n         \
+    \       ++time;\n            }\n            while (query.time < time) {\n    \
+    \            --time;\n                undo(time, left, right);\n            }\n\
+    \            while (query.left < left) add_left(--left);\n            while (right\
+    \ < query.right) add_right(right++);\n            while (left < query.left) remove_left(left++);\n\
+    \            while (query.right < right) remove_right(--right);\n            answer(query.id);\n\
+    \        }\n    }\n\n    template <class Add, class Remove, class Apply, class\
+    \ Undo, class Answer>\n    void run(Add add, Remove remove, Apply apply, Undo\
+    \ undo, Answer answer,\n             int block_size = 0) const {\n        run(add,\
+    \ add, remove, remove, apply, undo, answer, block_size);\n    }\n};\n\n}  // namespace\
+    \ algo\n}  // namespace m1une\n\n\n#line 1 \"algo/offline/parallel_binary_search.hpp\"\
     \n\n\n\n#line 6 \"algo/offline/parallel_binary_search.hpp\"\n\nnamespace m1une\
     \ {\nnamespace algo {\n\ntemplate <class Apply, class Check, class Reset>\nstd::vector<int>\
     \ parallel_binary_search(\n    int query_count,\n    int event_count,\n    Apply\
@@ -412,7 +486,7 @@ data:
     \ {\n                if (check(query)) {\n                    high[query] = middle;\n\
     \                } else {\n                    low[query] = middle;\n        \
     \        }\n            }\n        }\n    }\n\n    return high;\n}\n\n}  // namespace\
-    \ algo\n}  // namespace m1une\n\n\n#line 7 \"algo/offline/all.hpp\"\n\n\n#line\
+    \ algo\n}  // namespace m1une\n\n\n#line 8 \"algo/offline/all.hpp\"\n\n\n#line\
     \ 1 \"algo/search/all.hpp\"\n\n\n\n#line 1 \"algo/search/bisect.hpp\"\n\n\n\n\
     #line 5 \"algo/search/bisect.hpp\"\n\nnamespace m1une {\nnamespace algo {\n\n\
     template <typename F>\nlong long first_true(long long ng, long long ok, F pred)\
@@ -743,6 +817,7 @@ data:
   - algo/offline/all.hpp
   - algo/offline/cdq_divide_and_conquer.hpp
   - algo/offline/mo.hpp
+  - algo/offline/mo_with_updates.hpp
   - algo/offline/parallel_binary_search.hpp
   - algo/search/all.hpp
   - algo/search/bisect.hpp
@@ -760,7 +835,7 @@ data:
   isVerificationFile: false
   path: algo/all.hpp
   requiredBy: []
-  timestamp: '2026-10-30 15:56:19+09:00'
+  timestamp: '2026-11-17 04:04:19+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/all.hpp
@@ -785,6 +860,6 @@ If a header builds an object and then answers repeated queries, it belongs in
 | --- | --- |
 | `algo/sequence/all.hpp` | Sequence and array algorithms such as LIS, inversion count, non-adjacent selection, run-length encoding, and subset sum. |
 | `algo/search/all.hpp` | Search-over-answer and unimodal optimization helpers. |
-| `algo/offline/all.hpp` | Offline query processing such as Mo's algorithm. |
+| `algo/offline/all.hpp` | Static Mo and Mo with point updates, CDQ divide-and-conquer, and parallel binary search. |
 | `algo/enumeration/all.hpp` | Combinatorial traversal helpers such as Gray-code enumeration. |
 | `algo/dp/all.hpp` | Domain-neutral DP helpers such as knapsack routines. |

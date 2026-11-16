@@ -135,6 +135,9 @@ data:
       path: algo/offline/mo.hpp
       title: Mo's Algorithm
     - icon: ':heavy_check_mark:'
+      path: algo/offline/mo_with_updates.hpp
+      title: Mo's Algorithm with Updates
+    - icon: ':heavy_check_mark:'
       path: algo/offline/parallel_binary_search.hpp
       title: Parallel Binary Search
   - name: algo/search
@@ -1536,6 +1539,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/offline/mo.test.cpp
       title: verify/algo/offline/mo.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/offline/mo_with_updates.test.cpp
+      title: verify/algo/offline/mo_with_updates.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/algo/offline/parallel_binary_search.test.cpp
       title: verify/algo/offline/parallel_binary_search.test.cpp
