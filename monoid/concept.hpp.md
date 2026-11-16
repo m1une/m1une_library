@@ -117,6 +117,12 @@ data:
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/doubling.hpp
+    title: Doubling with Monoid Aggregates
+  - icon: ':heavy_check_mark:'
     path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
@@ -274,6 +280,18 @@ data:
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling.test.cpp
+    title: verify/graph/doubling.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling_jump_on_tree.test.cpp
+    title: verify/graph/doubling_jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -282,6 +300,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/library_checker_lowest_common_ancestor.test.cpp
     title: verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
@@ -392,6 +413,8 @@ data:
   - acted_monoid/range_update_range_product.hpp
   - acted_monoid/range_update_range_product.hpp
   - monoid/power.hpp
+  - graph/doubling.hpp
+  - graph/all.hpp
   - graph/all.hpp
   - graph/all.hpp
   - graph/tree/tree.hpp
@@ -449,9 +472,13 @@ data:
   - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp
+  - verify/graph/doubling.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/doubling_jump_on_tree.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
@@ -459,6 +486,7 @@ data:
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/tree_cumulative_sum.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/range_edge_graph.test.cpp
 documentation_of: monoid/concept.hpp

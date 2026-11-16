@@ -83,6 +83,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/doubling.hpp
+    title: Doubling with Monoid Aggregates
+  - icon: ':heavy_check_mark:'
     path: graph/enumerate_cliques.hpp
     title: Enumerate Cliques
   - icon: ':heavy_check_mark:'
@@ -283,6 +286,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: monoid/add.hpp
     title: Add Monoid
+  - icon: ':heavy_check_mark:'
+    path: monoid/concept.hpp
+    title: Monoid Concept
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
@@ -3201,7 +3207,75 @@ data:
     \       continue;\n        }\n        int child = result.children[current][child_index++];\n\
     \        result.tin[child] = timer++;\n        tree_stack.emplace_back(child,\
     \ 0);\n    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/flow/flow.hpp\"\n\n\n\n#line 1 \"graph/flow/bounded_flow.hpp\"\
+    \ m1une\n\n\n#line 1 \"graph/doubling.hpp\"\n\n\n\n#line 5 \"graph/doubling.hpp\"\
+    \n#include <bit>\n#line 11 \"graph/doubling.hpp\"\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 13 \"graph/doubling.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\n// Static binary lifting with ordered\
+    \ aggregates. A step collects values[v]\n// before moving to successor[v]. State\
+    \ -1 stays at -1 and contributes id().\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    class Doubling {\n   public:\n    using value_type = typename Monoid::value_type;\n\
+    \n    struct Result {\n        int vertex;\n        value_type product;\n    };\n\
+    \n   private:\n    int _n = 0;\n    int _levels = 0;\n    std::uint64_t _max_steps\
+    \ = 0;\n    // Level-major flat tables: the entry at (bit, v) describes 2^bit\
+    \ steps.\n    std::vector<int> _next;\n    std::vector<value_type> _products;\n\
+    \n    void check_query(int vertex, std::uint64_t steps) const {\n        assert(-1\
+    \ <= vertex && vertex < _n);\n        assert(steps <= _max_steps);\n        (void)vertex;\n\
+    \        (void)steps;\n    }\n\n   public:\n    Doubling() = default;\n\n    Doubling(const\
+    \ std::vector<int>& successor, const std::vector<value_type>& values,\n      \
+    \       std::uint64_t max_steps) {\n        build(successor, values, max_steps);\n\
+    \    }\n\n    void build(const std::vector<int>& successor, const std::vector<value_type>&\
+    \ values,\n               std::uint64_t max_steps) {\n        assert(successor.size()\
+    \ == values.size());\n        assert(successor.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \        const int n = int(successor.size());\n        for (int to : successor)\
+    \ {\n            assert(-1 <= to && to < n);\n            (void)to;\n        }\n\
+    \        _n = n;\n        _levels = std::bit_width(max_steps);\n        _max_steps\
+    \ = max_steps;\n        assert(_levels == 0 || std::size_t(n) <=\n           \
+    \        std::numeric_limits<std::size_t>::max() / std::size_t(_levels));\n  \
+    \      const std::size_t total = std::size_t(n) * std::size_t(_levels);\n    \
+    \    _next = std::vector<int>(total, -1);\n        _products = std::vector<value_type>(total,\
+    \ Monoid::id());\n        if (_levels == 0) return;\n\n        std::copy(successor.begin(),\
+    \ successor.end(), _next.begin());\n        std::copy(values.begin(), values.end(),\
+    \ _products.begin());\n        for (int bit = 1; bit < _levels; ++bit) {\n   \
+    \         const std::size_t previous = std::size_t(bit - 1) * std::size_t(n);\n\
+    \            const std::size_t current = previous + std::size_t(n);\n        \
+    \    for (int vertex = 0; vertex < n; ++vertex) {\n                const int middle\
+    \ = _next[previous + vertex];\n                if (middle == -1) {\n         \
+    \           _products[current + vertex] = _products[previous + vertex];\n    \
+    \            } else {\n                    _next[current + vertex] = _next[previous\
+    \ + middle];\n                    _products[current + vertex] = Monoid::op(\n\
+    \                        _products[previous + vertex], _products[previous + middle]);\n\
+    \                }\n            }\n        }\n    }\n\n    int size() const {\
+    \ return _n; }\n\n    bool empty() const { return _n == 0; }\n\n    int levels()\
+    \ const { return _levels; }\n\n    std::uint64_t max_steps() const { return _max_steps;\
+    \ }\n\n    int jump(int vertex, std::uint64_t steps) const {\n        check_query(vertex,\
+    \ steps);\n        while (steps != 0 && vertex != -1) {\n            const int\
+    \ bit = std::countr_zero(steps);\n            vertex = _next[std::size_t(bit)\
+    \ * std::size_t(_n) + vertex];\n            steps &= steps - 1;\n        }\n \
+    \       return vertex;\n    }\n\n    Result walk(int vertex, std::uint64_t steps)\
+    \ const {\n        check_query(vertex, steps);\n        Result result{vertex,\
+    \ Monoid::id()};\n        while (steps != 0 && result.vertex != -1) {\n      \
+    \      const int bit = std::countr_zero(steps);\n            const std::size_t\
+    \ index = std::size_t(bit) * std::size_t(_n) + result.vertex;\n            result.product\
+    \ = Monoid::op(result.product, _products[index]);\n            result.vertex =\
+    \ _next[index];\n            steps &= steps - 1;\n        }\n        return result;\n\
+    \    }\n\n    value_type prod(int vertex, std::uint64_t steps) const {\n     \
+    \   return walk(vertex, steps).product;\n    }\n};\n\n}  // namespace graph\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/flow/flow.hpp\"\n\n\n\n#line 1 \"graph/flow/bounded_flow.hpp\"\
     \n\n\n\n#line 7 \"graph/flow/bounded_flow.hpp\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
     \n\n\n\n#line 9 \"graph/flow/max_flow.hpp\"\n\nnamespace m1une {\nnamespace flow\
     \ {\n\ntemplate <class Cap>\nstruct MaxFlow {\n    struct Edge {\n        int\
@@ -3930,12 +4004,11 @@ data:
     \            v = _up[k][v];\n        }\n        result = std::min(result, _minimum[0][u]);\n\
     \        result = std::min(result, _minimum[0][v]);\n        return result;\n\
     \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/min_cost_flow.hpp\"\
-    \n\n\n\n#line 6 \"graph/flow/min_cost_flow.hpp\"\n#include <bit>\n#line 15 \"\
-    graph/flow/min_cost_flow.hpp\"\n\n#line 18 \"graph/flow/min_cost_flow.hpp\"\n\n\
-    namespace m1une {\nnamespace flow {\n\ntemplate <class Cap, class Cost>\nstruct\
-    \ MinCostFlow {\n    struct Edge {\n        int from;\n        int to;\n     \
-    \   Cap cap;\n        Cap flow;\n        Cost cost;\n    };\n\n   private:\n \
-    \   struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
+    \n\n\n\n#line 15 \"graph/flow/min_cost_flow.hpp\"\n\n#line 18 \"graph/flow/min_cost_flow.hpp\"\
+    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap, class Cost>\n\
+    struct MinCostFlow {\n    struct Edge {\n        int from;\n        int to;\n\
+    \        Cap cap;\n        Cap flow;\n        Cost cost;\n    };\n\n   private:\n\
+    \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
     \        Cost cost;\n    };\n\n    int _n;\n    std::vector<std::pair<int, int>>\
     \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n    bool _has_negative_cost;\n\
     \    bool _has_flow;\n\n    template <class Key>\n    struct RadixHeap {\n   \
@@ -4516,33 +4589,17 @@ data:
     \    // Returns the sum of a and b.\n    static constexpr T op(const T& a, const\
     \ T& b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T&\
     \ x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies\
-    \ the requirements of a Monoid.\n// A Monoid must have a `value_type`, an identity\
-    \ element `id()`, and an associative binary operation `op()`.\ntemplate <typename\
-    \ M>\nconcept IsMonoid = requires(typename M::value_type a, typename M::value_type\
-    \ b) {\n    // 1. Must define `value_type`\n    typename M::value_type;\n\n  \
-    \  // 2. Must have a static method `id()` returning `value_type`\n    { M::id()\
-    \ } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
-    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 12 \"graph/tree/cumulative_sum.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace tree {\n\n// Static cumulative products on root paths. Values\
-    \ are attached to vertices by\n// default; set EdgeValues to true to index them\
-    \ by graph edge id instead.\ntemplate <m1une::monoid::IsCommutativeGroup Group,\
-    \ bool EdgeValues = false>\nclass TreeCumulativeProduct {\n   public:\n    using\
-    \ value_type = typename Group::value_type;\n\n   private:\n    int _n = 0;\n \
-    \   int _root = -1;\n    std::vector<int> _parent;\n    std::vector<int> _depth;\n\
-    \    std::vector<int> _head;\n    std::vector<value_type> _prefix;\n\n    void\
-    \ check_vertex(int vertex) const {\n        assert(0 <= vertex && vertex < _n);\n\
-    \    }\n\n   public:\n    TreeCumulativeProduct() = default;\n\n    template <class\
-    \ EdgeCost>\n    explicit TreeCumulativeProduct(\n        const m1une::graph::Graph<EdgeCost>&\
+    \ m1une\n\n\n#line 12 \"graph/tree/cumulative_sum.hpp\"\n\nnamespace m1une {\n\
+    namespace tree {\n\n// Static cumulative products on root paths. Values are attached\
+    \ to vertices by\n// default; set EdgeValues to true to index them by graph edge\
+    \ id instead.\ntemplate <m1une::monoid::IsCommutativeGroup Group, bool EdgeValues\
+    \ = false>\nclass TreeCumulativeProduct {\n   public:\n    using value_type =\
+    \ typename Group::value_type;\n\n   private:\n    int _n = 0;\n    int _root =\
+    \ -1;\n    std::vector<int> _parent;\n    std::vector<int> _depth;\n    std::vector<int>\
+    \ _head;\n    std::vector<value_type> _prefix;\n\n    void check_vertex(int vertex)\
+    \ const {\n        assert(0 <= vertex && vertex < _n);\n    }\n\n   public:\n\
+    \    TreeCumulativeProduct() = default;\n\n    template <class EdgeCost>\n   \
+    \ explicit TreeCumulativeProduct(\n        const m1une::graph::Graph<EdgeCost>&\
     \ graph,\n        const std::vector<value_type>& values,\n        int root = 0\n\
     \    ) {\n        build(graph, values, root);\n    }\n\n    template <class EdgeCost>\n\
     \    void build(\n        const m1une::graph::Graph<EdgeCost>& graph,\n      \
@@ -7870,7 +7927,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 32 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n"
+    \n\n#line 32 \"graph/undirected.hpp\"\n\n\n#line 16 \"graph/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_ALL_HPP
 
     #define M1UNE_GRAPH_ALL_HPP 1
@@ -7881,6 +7938,8 @@ data:
     #include "directed.hpp"
 
     #include "dominator_tree.hpp"
+
+    #include "doubling.hpp"
 
     #include "flow/flow.hpp"
 
@@ -7942,6 +8001,8 @@ data:
   - graph/zero_one_bfs.hpp
   - graph/two_sat.hpp
   - graph/dominator_tree.hpp
+  - graph/doubling.hpp
+  - monoid/concept.hpp
   - graph/flow/flow.hpp
   - graph/flow/bounded_flow.hpp
   - graph/flow/max_flow.hpp
@@ -8003,7 +8064,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-08-29 18:27:41+09:00'
+  timestamp: '2026-11-17 03:42:34+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
@@ -8058,6 +8119,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
 | `graph/incremental_scc.hpp` | Directed only | Offline SCC merge times under edge insertions. |
 | `graph/functional_graph.hpp` | One successor per vertex | Cycle decomposition, large jumps, paths and orbits, visit counts, reachability distances, and synchronized meetings. |
+| `graph/doubling.hpp` | Fixed successor transitions | Binary lifting with ordered monoid aggregates, optional stop state, and 64-bit step counts. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |

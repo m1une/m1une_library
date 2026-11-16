@@ -89,6 +89,13 @@ does not itself guarantee that sums or products cannot overflow.
 | Static range aggregate | [Disjoint sparse table](https://m1une.github.io/m1une_library/ds/range_query/disjoint_sparse_table.hpp) | Any monoid. |
 | Queue with an aggregate | [Sliding window aggregation](https://m1une.github.io/m1une_library/ds/range_query/sliding_window_aggregation.hpp) | Any monoid. |
 
+## Repeated Transitions
+
+[Doubling](https://m1une.github.io/m1une_library/graph/doubling.hpp)
+preprocesses a fixed successor and a value for every state. It returns the
+destination and ordered monoid product after a specified number of steps.
+Choose an explicit maximum step count to control preprocessing and memory.
+
 ## Monoids and Updates
 
 A [monoid](https://m1une.github.io/m1une_library/monoid/concept.hpp) supplies

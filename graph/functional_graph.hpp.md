@@ -286,6 +286,10 @@ Construct it directly from a successor array: `successor[v]` is the vertex
 reached after one step from `v`. Self-loops and disconnected components are
 supported. The object is static; call `build` again to replace the graph.
 
+For repeated transitions with sums or other monoid aggregates, including
+transitions to a stop state `-1`, use
+[Doubling](https://m1une.github.io/m1une_library/graph/doubling.hpp).
+
 ## Public Fields
 
 | Field | Meaning |

@@ -622,6 +622,12 @@ data:
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling.test.cpp
+    title: verify/graph/doubling.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling_jump_on_tree.test.cpp
+    title: verify/graph/doubling_jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/enumerate_cliques.test.cpp
     title: verify/graph/enumerate_cliques.test.cpp
   - icon: ':heavy_check_mark:'
@@ -2008,6 +2014,7 @@ data:
   - verify/string/lyndon_factorization.test.cpp
   - verify/string/minimum_rotation.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/graph/doubling.test.cpp
   - verify/graph/bipartite_matching.test.cpp
   - verify/graph/library_checker_maximum_independent_set.test.cpp
   - verify/graph/cycle_detection.test.cpp
@@ -2020,6 +2027,7 @@ data:
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - verify/graph/count_four_cycles.test.cpp
   - verify/graph/block_cut_tree.test.cpp
+  - verify/graph/doubling_jump_on_tree.test.cpp
   - verify/graph/dfs.test.cpp
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/eulerian_trail_undirected.test.cpp

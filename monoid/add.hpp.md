@@ -100,6 +100,12 @@ data:
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling.test.cpp
+    title: verify/graph/doubling.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling_jump_on_tree.test.cpp
+    title: verify/graph/doubling_jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -181,7 +187,9 @@ data:
   - verify/ds/persistent_cow.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
   - verify/monoid/commutative_flags.test.cpp
+  - verify/graph/doubling.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/doubling_jump_on_tree.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp

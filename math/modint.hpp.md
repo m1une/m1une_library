@@ -190,6 +190,9 @@ data:
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling.test.cpp
+    title: verify/graph/doubling.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -835,6 +838,7 @@ data:
   - verify/utilities/bigint_gcd.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/graph/doubling.test.cpp
   - verify/graph/graph_counting.test.cpp
   - verify/graph/graph_counting.test.cpp
   - verify/graph/graph_algorithms.test.cpp

@@ -813,6 +813,9 @@ data:
       path: graph/dominator_tree.hpp
       title: Dominator Tree
     - icon: ':heavy_check_mark:'
+      path: graph/doubling.hpp
+      title: Doubling with Monoid Aggregates
+    - icon: ':heavy_check_mark:'
       path: graph/enumerate_cliques.hpp
       title: Enumerate Cliques
     - icon: ':heavy_check_mark:'
@@ -2172,6 +2175,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/dominator_tree.test.cpp
       title: verify/graph/dominator_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/doubling.test.cpp
+      title: verify/graph/doubling.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/doubling_jump_on_tree.test.cpp
+      title: verify/graph/doubling_jump_on_tree.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/enumerate_cliques.test.cpp
       title: verify/graph/enumerate_cliques.test.cpp

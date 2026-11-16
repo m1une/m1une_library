@@ -10,6 +10,9 @@ data:
     path: verify/ds/segtree/dynamic_dual_segtree.test.cpp
     title: verify/ds/segtree/dynamic_dual_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/doubling.test.cpp
+    title: verify/graph/doubling.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/monoid/commutative_flags.test.cpp
     title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
@@ -59,6 +62,7 @@ data:
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/monoid/commutative_flags.test.cpp
+  - verify/graph/doubling.test.cpp
 documentation_of: monoid/affine.hpp
 layout: document
 title: Affine Monoid
