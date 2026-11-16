@@ -4,6 +4,7 @@
 #include "counting.hpp"
 #include "directed.hpp"
 #include "dominator_tree.hpp"
+#include "doubling.hpp"
 #include "flow/flow.hpp"
 #include "graph.hpp"
 #include "grid.hpp"
