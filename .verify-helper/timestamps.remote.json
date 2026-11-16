@@ -76,6 +76,7 @@
 "verify/ds/hash_table/hash_set.test.cpp": "2026-10-06 01:57:24 +0900",
 "verify/ds/heap/double_ended_priority_queue.test.cpp": "2026-10-06 01:57:24 +0900",
 "verify/ds/heap/meldable_heap.test.cpp": "2026-10-06 01:57:24 +0900",
+"verify/ds/interval_set/interval_map.test.cpp": "2026-11-17 03:01:34 +0900",
 "verify/ds/interval_set/interval_set.test.cpp": "2026-10-06 01:57:24 +0900",
 "verify/ds/persistent_cow.test.cpp": "2026-10-06 01:57:24 +0900",
 "verify/ds/persistent_release.test.cpp": "2026-10-06 01:57:24 +0900",
