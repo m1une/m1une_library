@@ -33,7 +33,7 @@ edge id, and deletion refers to that id.
 | `int add_edge(int u, int v)` | Records an insertion and returns its edge id. | Amortized `O(1)` |
 | `bool erase_edge(int id)` | Records deletion of an active edge. Returns false if already erased. | `O(1)` |
 | `int add_query(int u, int v)` | Records a query and returns its query id. | Amortized `O(1)` |
-| `vector<bool> solve() const` | Returns answers in query-id order. | `O((Q + L log Q) log N)` |
+| `std::vector<bool> solve() const` | Returns answers in query-id order. | `O((Q + L log Q) log N)` |
 
 Here `Q` is the number of recorded operations and `L` is the number of inserted
 edges. The segment-tree storage uses `O(Q + L log Q)` memory. The extra

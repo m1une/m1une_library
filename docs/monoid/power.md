@@ -5,8 +5,8 @@ documentation_of: ../../monoid/power.hpp
 
 ## Overview
 
-A utility function that computes the $n$-th power of an element $a$ in a generic Monoid using binary exponentiation. It operates in $O(\log n)$ time.
-This is highly useful for fast matrix exponentiation, string repetition, or finding the $n$-th composition of a function.
+A utility function that computes the $n$-th power of an element $a$ in a generic Monoid using binary exponentiation. It uses $O(\log(n + 1))$ monoid operations.
+Use it for fast matrix exponentiation, string repetition, or finding the $n$-th composition of a function.
 
 ## Template Parameters
 
@@ -16,6 +16,15 @@ This is highly useful for fast matrix exponentiation, string repetition, or find
 
 * `typename M::value_type a`: The base element.
 * `long long n`: The exponent (number of times to apply the operation).
+
+## Interface and Complexity
+
+| Function | Description | Complexity |
+| --- | --- | --- |
+| `template <IsMonoid M> constexpr typename M::value_type power(typename M::value_type a, long long n)` | Combines `n` copies of `a`; returns `M::id()` for `n == 0`. Requires `n >= 0`. | $O(\log(n + 1))$ calls to `M::op`, plus value copies. |
+
+The function does not modify the supplied value. For a matrix monoid with
+dimension `D`, the time is $O(D^3 \log(n + 1))$.
 
 ## Example
 
@@ -38,14 +47,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `id()`, and `op(a, b)` members. If the type also provides helpers
-such as `make(...)` or `inv(x)`, they are described above or in the documented
-properties.
-
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.

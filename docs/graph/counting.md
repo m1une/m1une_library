@@ -47,7 +47,7 @@ possible directed edges is chosen. A strongly connected labeled tournament is a
 labeled tournament in which every ordered pair of vertices `(u, v)` has a
 directed path from `u` to `v`.
 
-## Public Interface
+## Interface
 
 All signatures below are in namespace `m1une::graph`.
 

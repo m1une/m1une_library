@@ -135,7 +135,7 @@ Floor sums appear when:
 * counting integers satisfying linear inequalities;
 * optimizing periodic arithmetic sequences.
 
-## API
+## Interface
 
 ```cpp
 std::tuple<long long, long long, long long> extended_gcd(
@@ -176,7 +176,7 @@ reads its two vectors by const reference and does not modify them.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `extended_gcd(a, b)` | Returns `(g, x, y)` with `g = gcd(a, b)` and `a * x + b * y = g`. | $O(\log(\max(|a|, |b|)+1))$ |
+| `extended_gcd(a, b)` | Returns `(g, x, y)` with `g = gcd(a, b)` and `a * x + b * y = g`. | $O(\log(\max(\lvert a \rvert, \lvert b \rvert)+1))$ |
 | `pow_mod(x, exponent, mod)` | Returns `x` raised to `exponent` modulo `mod`. | $O(\log(\text{exponent}))$ |
 | `inv_gcd(x, mod)` | Returns the gcd and a normalized inverse of `x / gcd` modulo `mod / gcd`. | $O(\log(\text{mod}))$ |
 | `inv_mod(x, mod)` | Returns the modular inverse of `x`. The arguments must be coprime. | $O(\log(\text{mod}))$ |

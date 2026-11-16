@@ -15,7 +15,7 @@ The implementation uses exact NTT convolutions rather than randomized hashing.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `vector<bool> wildcard_pattern_matching(const string& text, const string& pattern, char wildcard = '*')` | Returns one flag for each alignment; result `i` describes `text[i, i + pattern.size())`. | $O((N + M) \log(N + M))$ time and $O(N + M)$ memory |
+| `std::vector<bool> wildcard_pattern_matching(const string& text, const string& pattern, char wildcard = '*')` | Returns one flag for each alignment; result `i` describes `text[i, i + pattern.size())`. | $O((N + M) \log(N + M))$ time and $O(N + M)$ memory |
 
 An empty pattern matches at all `N + 1` positions. If the pattern is longer
 than the text, the result is empty. Characters are treated as bytes, so this

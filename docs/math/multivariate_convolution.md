@@ -21,7 +21,7 @@ Two products are available:
   reduction modulo
   $(1-x_0^{n_0}, \ldots, 1-x_{k-1}^{n_{k-1}})$.
 
-## API
+## Interface
 
 | Function | Description | Complexity |
 | --- | --- | --- |

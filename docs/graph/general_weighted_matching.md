@@ -13,7 +13,7 @@ The implementation is a primal-dual weighted blossom algorithm with Gabow's
 data structures. It is intended for exact integer-weight matching and runs in
 $O(NM\log N)$ time and $O(N+M)$ memory.
 
-## Template Requirements
+## Requirements
 
 `Cost` is the edge-weight type and `TotalCost` is the accumulated answer type.
 Both must be signed integer types. `TotalCost` defaults to `Cost`; choose a

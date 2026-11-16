@@ -9,7 +9,7 @@ A math utility function that calculates the smallest power of two that is greate
 
 This is frequently used internally to determine the optimal underlying array size for complete binary tree structures (like Segment Trees) so that their length is perfectly aligned to a power of 2.
 
-## API
+## Interface
 
 ```cpp
 template <typename T>

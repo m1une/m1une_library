@@ -12,7 +12,7 @@ the product keeps the original left-to-right order defined by `Monoid::op`.
 Assigning `value` to a segment of length $k$ changes its aggregate to
 $value^k$. The adapter computes this power with binary exponentiation.
 
-## Requirements and behavior
+## Requirements and Behavior
 
 `Monoid` must satisfy `m1une::monoid::IsMonoid`. In particular, it provides:
 
@@ -46,10 +46,14 @@ For `using AM = m1une::acted_monoid::RangeUpdateRangeProduct<Monoid>;`:
 | Apply assignment | `static constexpr value_type mapping(const operator_type& f, const value_type& x);` | Replaces `x.product` by the assigned value to the power `x.size`. | $O(\log x.size)$ monoid operations for an assignment; otherwise one node copy. |
 | Make leaf | `static constexpr value_type make(const base_type& value);` | Returns `{value, 1}`. | One value copy. |
 
-With `m1une::ds::LazySegtree<AM>` on $N$ elements, construction and range
-product take $O(N)$ and $O(\log N)$ monoid operations respectively. A range
-assignment takes $O(\log^2 N)$ monoid operations in the worst case because up
-to $O(\log N)$ segment-tree nodes each compute a power. Memory use is $O(N)$.
+With `m1une::ds::LazySegtree<AM>` on $N$ elements, construction uses $O(N)$
+monoid operations and stores $O(N)$ aggregate values. Range assignment takes
+$O(\log^2 N)$ monoid operations in the worst case: each of $O(\log N)$ nodes
+may compute a power. A partial range query or point lookup can also take
+$O(\log^2 N)$ monoid operations when it pushes pending assignments. A query
+with no tags to push uses $O(\log N)$ monoid operations; `all_prod()` simply
+copies the stored root aggregate. Account separately for the size of a base
+value, its copies, and its monoid-operation cost.
 
 ## Example
 

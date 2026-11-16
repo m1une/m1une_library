@@ -22,6 +22,33 @@ If the $i$-th bit of $f$ is set, the new number of set bits at position $i$ with
 
 When initializing a Lazy Segment Tree, you must use the `make(val)` helper function so that the leaf nodes correctly initialize their internal bit count arrays and size.
 
+## Requirements and Behavior
+
+The node stores `T sum`, `std::array<int, BITS> bit_count`, and
+`long long size`. XOR flips selected bit counts from `count` to `size - count`.
+Read the answer from `.sum`. `op_id()` is zero and composition is bitwise XOR.
+
+## Interface and Complexity
+
+```cpp
+using value_type = RangeXorRangeSumNode<T, BITS>;
+using operator_type = T;
+```
+
+Let $B = \mathtt{BITS}$. Values and masks must be nonnegative and fit in the lowest `BITS` bits. Choose `T` wide enough for the segment sum and keep segment lengths within `int` for the per-bit counts.
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the empty value-monoid identity. | $O(B)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(B)$ |
+| `static constexpr operator_type op_id()` | Returns the identity update. | $O(1)$ |
+| `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)` | Composes updates: apply `g` first, then `f`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Returns the aggregate after applying `f`; does not modify `x`. | $O(B)$ |
+| `static constexpr value_type make(const T& val)` | Creates a one-element aggregate. | $O(B)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+With `LazySegtree`, construction uses $O(NB)$ time and space, and range updates and queries take $O(B \log N)$ time.
+
 ## Example
 
 ```cpp
@@ -57,13 +84,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless acted-monoid tag. Lazy data structures use its public
-`value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
-and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
-reversal-aware mappings are described above when the header provides them.
-
-The static operations are $O(1)$ for the scalar metadata stored by these range
-acted monoids, aside from the cost of the underlying arithmetic type.

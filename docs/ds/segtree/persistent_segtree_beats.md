@@ -64,7 +64,7 @@ Use `PersistentLazySegtree<ActedMonoid>` when every valid action always applies
 to an aggregate. Use nonpersistent `SegtreeBeats<ActedMonoid>` when old versions
 are unnecessary.
 
-## Beats acted monoid requirements
+## Beats Acted Monoid Requirements
 
 `ActedMonoid` must satisfy
 `m1une::beats_acted_monoid::IsBeatsActedMonoid` and provide:
@@ -108,7 +108,7 @@ starting at `p` receives `op_shift(f, p - l)`. Construction from
 `ActedMonoid::make(value, index)`, then conversion to `T`, choosing the first
 available operation.
 
-## Public interface
+## Interface
 
 All indices are zero-based and ranges are half-open. `T` is `value_type` and
 `F` is `operator_type`.

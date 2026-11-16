@@ -26,7 +26,7 @@ is prime.
 Entries use zero-based row and column indices. Duplicate positions are allowed
 and their values are added. Explicit zero entries are allowed.
 
-## API
+## Interface
 
 ```cpp
 template <class T>

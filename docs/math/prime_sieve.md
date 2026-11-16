@@ -89,7 +89,7 @@ The Mobius function is mainly used for inclusion-exclusion over divisors and
 for counting objects whose gcd is exactly `1`. See `prime_factorization.hpp`
 for the Mobius inversion formula.
 
-## API
+## Interface
 
 ```cpp
 struct PrimeSieve {

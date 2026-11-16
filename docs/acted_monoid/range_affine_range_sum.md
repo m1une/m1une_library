@@ -15,6 +15,25 @@ The `value_type` is defined as `RangeAffineRangeSumNode<T>`, which holds `T sum`
 
 When initializing a Lazy Segment Tree, you must initialize the leaf nodes with `size = 1`. Always use the helper function `make(val)` for this purpose.
 
+## Interface and Complexity
+
+```cpp
+using value_type = RangeAffineRangeSumNode<T>;
+using operator_type = std::pair<T, T>;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the empty value-monoid identity. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(1)$ |
+| `static constexpr int size(const value_type& value)` | Returns the represented segment length. | $O(1)$ |
+| `static constexpr operator_type op_id()` | Returns the identity update. | $O(1)$ |
+| `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)` | Composes updates: apply `g` first, then `f`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Returns the aggregate after applying `f`; does not modify `x`. | $O(1)$ |
+| `static constexpr value_type make(const T& val)` | Creates a one-element aggregate. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
 ## Example
 
 ```cpp
@@ -45,19 +64,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless acted-monoid tag. Lazy data structures use its public
-`value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
-and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
-reversal-aware mappings are described above when the header provides them.
-
-| Member | Description | Complexity |
-| --- | --- | --- |
-| `static constexpr bool commutative` | `true`; allows compatible dynamic sequences to omit a reversed aggregate. | $O(1)$ |
-| `static constexpr int size(const value_type& value)` | Returns `value.size`. | $O(1)$ |
-| `static constexpr value_type make(const T& val)` | Constructs a leaf with sum `val` and size `1`. | $O(1)$ |
-
-The static operations are $O(1)$ for the scalar metadata stored by these range
-acted monoids, aside from the cost of the underlying arithmetic type.

@@ -19,7 +19,7 @@ Typical examples:
 * path assign, path max
 * edge path updates by storing each edge as an extra node
 
-## Template Parameter
+## Template Parameters
 
 `ActedMonoid` must satisfy `m1une::acted_monoid::IsActedMonoid`:
 
@@ -95,7 +95,7 @@ Construction from `std::vector<U>` is supported when
 | `T prod(u, v)` | Returns the monoid product on the path from `u` to `v`. | Amortized $O(\log N)$ |
 | `T path_prod(u, v)` | Alias for `prod(u, v)`. | Amortized $O(\log N)$ |
 | `int path_size(u, v)` | Number of link-cut-tree vertices on the path from `u` to `v`. | Amortized $O(\log N)$ |
-| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-indexed. | Amortized $O(\log N)$ |
+| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-based. | Amortized $O(\log N)$ |
 | `int lca(u, v)` | Returns the LCA with respect to the current represented root, or `-1` if disconnected. | Amortized $O(\log N)$ |
 
 `prod`, `apply(u, v, f)`, `path_size`, and `kth_vertex` require `u` and `v` to

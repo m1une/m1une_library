@@ -11,7 +11,7 @@ Compresses consecutive equal values into `(value, count)` pairs. It works with c
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `run_length_encoding(container)` | Returns `vector<pair<T, long long>>` for consecutive runs. | $O(N)$ |
+| `run_length_encoding(container)` | Returns `std::vector<std::pair<T, long long>>` for consecutive runs. | $O(N)$ |
 
 ## Example
 

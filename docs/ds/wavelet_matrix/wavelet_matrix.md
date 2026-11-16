@@ -21,7 +21,7 @@ BMI2 for rank masking when those instruction sets are enabled at compile time;
 otherwise the same compact bit and prefix arrays use portable scalar
 operations.
 
-## Template Parameter
+## Template Parameters
 
 * `T`: A non-`bool` integral type.
 
@@ -53,8 +53,8 @@ All index ranges are half-open.
 | `T kth_largest(int l, int r, int k)` | Returns the zero-based `k`-th largest value in `[l, r)`. | $O(L)$ |
 | `int range_freq(int l, int r, T upper)` | Counts values less than `upper` in `[l, r)`. | $O(L)$ |
 | `int range_freq(int l, int r, T lower, T upper)` | Counts values in `[lower, upper)` within `[l, r)`. | $O(L)$ |
-| `optional<T> prev_value(int l, int r, T upper)` | Returns the greatest value less than `upper`, or `nullopt`. | $O(L)$ |
-| `optional<T> next_value(int l, int r, T lower)` | Returns the smallest value at least `lower`, or `nullopt`. | $O(L)$ |
+| `std::optional<T> prev_value(int l, int r, T upper)` | Returns the greatest value less than `upper`, or `nullopt`. | $O(L)$ |
+| `std::optional<T> next_value(int l, int r, T lower)` | Returns the smallest value at least `lower`, or `nullopt`. | $O(L)$ |
 
 `kth_smallest` and `kth_largest` require `0 <= k < r - l`.
 

@@ -81,7 +81,7 @@ At the root, this is the Lagrange interpolation polynomial through all
 $(x_i, y_i)$. Distinct points guarantee that every $P'(x_i)$ is nonzero and
 invertible.
 
-## API
+## Interface
 
 ```cpp
 template <class Mint>

@@ -19,13 +19,13 @@ The expressions `first[i] == second[j]` must be valid.
 
 | Field or Method | Description | Complexity |
 | --- | --- | --- |
-| `vector<pair<int, int>> matches` | Matched index pairs in increasing order. | `O(1)` |
+| `std::vector<std::pair<int, int>> matches` | Matched index pairs in increasing order. | `O(1)` |
 | `int length() const` | Returns the LCS length. | `O(1)` |
 | `bool empty() const` | Returns whether the length is zero. | `O(1)` |
-| `vector<int> first_indices() const` | Returns matched indices in the first sequence. | `O(L)` |
-| `vector<int> second_indices() const` | Returns matched indices in the second sequence. | `O(L)` |
-| `vector<T> values_from_first(first) const` | Returns the matched values from the first sequence. | `O(L)` |
-| `vector<T> values_from_second(second) const` | Returns the matched values from the second sequence. | `O(L)` |
+| `std::vector<int> first_indices() const` | Returns matched indices in the first sequence. | `O(L)` |
+| `std::vector<int> second_indices() const` | Returns matched indices in the second sequence. | `O(L)` |
+| `std::vector<T> values_from_first(first) const` | Returns the matched values from the first sequence. | `O(L)` |
+| `std::vector<T> values_from_second(second) const` | Returns the matched values from the second sequence. | `O(L)` |
 
 Here `L` is the LCS length. If several longest subsequences exist, any one of
 them may be returned.

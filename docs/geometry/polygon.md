@@ -305,7 +305,7 @@ int main() {
 }
 ```
 
-## Point records
+## Point Records
 
 ```cpp
 template <PointRecord P>

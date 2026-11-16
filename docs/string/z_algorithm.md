@@ -12,11 +12,16 @@ periodicity, borders, and comparing a fixed prefix against all positions.
 The function is generic over indexable sequences such as `std::string` and
 `std::vector<int>`.
 
+## Requirements
+
+`N` is the input length. The sequence must support `size()` and indexed access,
+and its elements need equality comparison. Bounds count one comparison as $O(1)$.
+
 ## Function
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `vector<int> z_algorithm(const Sequence& sequence)` | Returns `z[i] = LCP(sequence, sequence[i..])`. For a non-empty sequence, `z[0]` equals its length. | $O(N)$ |
+| `std::vector<int> z_algorithm(const Sequence& sequence)` | Returns `z[i] = LCP(sequence, sequence[i..])`. For a non-empty sequence, `z[0]` equals its length. | $O(N)$ |
 
 An empty sequence returns an empty vector.
 

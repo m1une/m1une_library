@@ -24,7 +24,7 @@ Inactive edges are also ignored.
 The DFS is iterative, so a path or cycle with many vertices does not consume
 the call stack.
 
-## API
+## Interface
 
 ```cpp
 struct ThreeEdgeConnectedComponentsResult {

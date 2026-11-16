@@ -20,7 +20,7 @@ The matrix entry type must be an integral type no wider than 64 bits. Entries
 may be signed or unsigned and are normalized modulo `modulus`. The modulus must
 be positive; `modulus == 1` is supported.
 
-## Public Interface
+## Interface
 
 ```cpp
 template <class Integer>

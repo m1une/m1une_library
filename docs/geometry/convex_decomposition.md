@@ -75,7 +75,7 @@ $O(N + \min\lbrace NR^2, R^4 \rbrace)$. The reduction is internal: output pieces
 contain the original polygon boundary, including vertices omitted from the DP
 instance. $R$ is not the number of vertices in the reduced polygon.
 
-## Input and output rules
+## Input and Output Rules
 
 The input may be clockwise or counterclockwise. A repeated closing point,
 consecutive duplicates, and redundant collinear boundary vertices are removed.

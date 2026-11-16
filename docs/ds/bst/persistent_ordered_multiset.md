@@ -29,7 +29,7 @@ while a live version depends on the pointed-to node.
 
 Trees passed to `merge` must use equivalent comparator state.
 
-## Constructors
+## Construction
 
 * `PersistentOrderedMultiset()`
   Constructs an empty multiset. ($O(1)$)
@@ -62,8 +62,8 @@ Trees passed to `merge` must use equivalent comparator state.
 | `bool erase_all_inplace(const T& key)` | Removes all copies in this version and returns whether the key existed. | $O(\log N)$ |
 | `bool contains(const T& key) const` | Returns whether `key` exists. | $O(\log N)$ |
 | `int count(const T& key) const` | Returns the multiplicity of `key`. | $O(\log N)$ |
-| `const T* find_by_order(int k) const` | Returns a pointer to the 0-indexed `k`-th smallest element. Requires `0 <= k < size()`. | $O(\log N)$ |
-| `T kth(int k) const` | Returns the 0-indexed `k`-th smallest element by value. Requires `0 <= k < size()`. | $O(\log N)$ |
+| `const T* find_by_order(int k) const` | Returns a pointer to the zero-based `k`-th smallest element. Requires `0 <= k < size()`. | $O(\log N)$ |
+| `T kth(int k) const` | Returns the zero-based `k`-th smallest element by value. Requires `0 <= k < size()`. | $O(\log N)$ |
 | `int order_of_key(const T& key) const` | Returns the number of elements strictly less than `key`. | $O(\log N)$ |
 | `int count_less(const T& key) const` | Alias for `order_of_key(key)`. | $O(\log N)$ |
 | `int count_less_equal(const T& key) const` | Returns the number of elements less than or equal to `key`. | $O(\log N)$ |

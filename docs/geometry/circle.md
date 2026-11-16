@@ -96,7 +96,7 @@ struct CircleLinearIntersection {
 };
 ```
 
-## Public interface
+## Interface
 
 The following signatures omit the repeated default `eps = 1e-12L` where it is
 clear from the table.
@@ -421,7 +421,7 @@ The linear intersection, `closest_points`, and `distance` overloads support
 both argument orders. Reversing a closest-point query returns the same
 witnesses in reversed fields.
 
-## Complexity and behavior
+## Complexity and Behavior
 
 | Function | Behavior | Complexity |
 | --- | --- | --- |

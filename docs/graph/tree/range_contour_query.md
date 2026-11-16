@@ -40,7 +40,7 @@ and `inv(x)` must return the group inverse. `m1une::monoid::Add<T>` and
 as minimum, maximum, GCD, AND, and OR are not supported because centroid
 inclusion-exclusion requires inverses.
 
-## Interfaces
+## Interface
 
 ```cpp
 template <m1une::monoid::IsCommutativeGroup Group>

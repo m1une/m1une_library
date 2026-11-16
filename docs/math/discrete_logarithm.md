@@ -16,7 +16,7 @@ The modulus may be prime or composite, and the base does not need to be
 invertible. Common factors are removed first, followed by a baby-step--giant-step
 search in the remaining multiplicative group.
 
-## API
+## Interface
 
 ```cpp
 std::optional<uint64_t> discrete_logarithm(

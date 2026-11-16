@@ -24,7 +24,7 @@ components.
 
 Both traversals are iterative, so deep paths do not consume the call stack.
 
-## API
+## Interface
 
 ```cpp
 struct TwoEdgeConnectedBridge {

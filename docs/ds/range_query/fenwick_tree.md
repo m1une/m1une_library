@@ -14,12 +14,25 @@ Indices are zero-based and range queries use half-open intervals `[l, r)`.
 
 * `T`: The underlying numeric type of the elements (e.g., `int`, `long long`, or a modular integer `modint`).
 
+## Requirements and Behavior
+
+`N` is the array length. `T{}` must be zero; prefix sums and updates use `+=`,
+and range sums use subtraction. Addition must form a commutative group for
+arbitrary signed updates and range sums. All intermediate sums must fit in `T`.
+
+`lower_bound(w)` has extra requirements: values must be nonnegative, and `T`
+must support the comparisons and subtraction used by the search. Its return
+value is a **prefix length**, which can be `N + 1` when no prefix reaches `w`.
+Ordinary sums and updates do not require an ordering, so they also work with
+modular integers.
+
 ## Methods
 
 | Method | Description | Complexity |
 | --- | --- | --- |
-| `FenwickTree(int n)` | Initializes an array of size `n` with `0`s. | $O(N)$ |
-| `FenwickTree(const std::vector<T>& a)` | Builds a tree from a given vector array `a`. | $O(N)$ |
+| `FenwickTree()` | Creates an empty tree. | $O(1)$ |
+| `explicit FenwickTree(int n)` | Initializes an array of size `n` with `0`s. | $O(N)$ |
+| `explicit FenwickTree(const std::vector<T>& a)` | Builds a tree from a given vector array `a`. | $O(N)$ |
 | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `bool empty() const` | Returns whether the tree is empty. | $O(1)$ |
 | `void add(int p, const T& x)` | Adds `x` to the element at index `p`. | $O(\log N)$ |

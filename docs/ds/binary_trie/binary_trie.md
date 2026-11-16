@@ -46,9 +46,9 @@ Let $B$ be `BitWidth`.
 | `int count(UInt value) const` | Returns the multiplicity of `value`. | $O(B)$ |
 | `bool contains(UInt value) const` | Returns whether `value` exists. | $O(B)$ |
 | `void xor_all(UInt value)` | Applies xor with `value` to every stored value. | $O(1)$ |
-| `UInt kth(int k) const` | Returns the 0-indexed `k`-th smallest stored value. | $O(B)$ |
+| `UInt kth(int k) const` | Returns the zero-based `k`-th smallest stored value. | $O(B)$ |
 | `UInt min() const`, `UInt max() const` | Returns the smallest or largest value. Requires a nonempty trie. | $O(B)$ |
-| `UInt kth_xor(int k, UInt value) const` | Returns the 0-indexed `k`-th smallest result among `stored_value ^ value`. | $O(B)$ |
+| `UInt kth_xor(int k, UInt value) const` | Returns the zero-based `k`-th smallest result among `stored_value ^ value`. | $O(B)$ |
 | `UInt min_xor(UInt value) const`, `UInt max_xor(UInt value) const` | Returns the minimum or maximum result among `stored_value ^ value`. Requires a nonempty trie. | $O(B)$ |
 | `int order_of_key(UInt value) const`, `int count_less(UInt value) const` | Returns the number of stored values strictly less than `value`. | $O(B)$ |
 | `int count_less_equal(UInt value) const` | Returns the number of stored values less than or equal to `value`. | $O(B)$ |

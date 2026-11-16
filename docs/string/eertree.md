@@ -65,17 +65,17 @@ Let `D` be the number of distinct palindromes.
 | `node_id last() const` | Returns the longest palindromic suffix node. | `O(1)` |
 | `int longest_suffix_length() const` | Returns its length. | `O(1)` |
 | `const Node& node(id) const` | Returns node metadata. | `O(1)` |
-| `const vector<Node>& nodes() const` | Returns all nodes. | `O(1)` |
+| `const std::vector<Node>& nodes() const` | Returns all nodes. | `O(1)` |
 | `node_id longest_suffix_node(prefix_length) const` | Returns the longest suffix of that nonempty prefix. | `O(1)` |
-| `const vector<node_id>& longest_suffix_nodes() const` | Returns this node for every prefix. | `O(1)` |
+| `const std::vector<node_id>& longest_suffix_nodes() const` | Returns this node for every prefix. | `O(1)` |
 | `void for_each_suffix(id, callback) const` | Enumerates nonempty palindromic suffix nodes beginning at `id`. | `O(P)` |
 | `void for_each_suffix(callback) const` | Enumerates suffixes of the complete current text. | `O(P)` |
 | `void reserve(capacity)` | Reserves text and node storage. | `O(D)` if reallocated |
 | `void clear()` | Resets to the two roots. | `O(D)` |
 | `node_id add(symbol)` | Appends one symbol and returns the new longest suffix. | Amortized `O(1)` |
 | `void build(sequence)` | Appends every symbol in the sequence. | Amortized `O(N)` |
-| `vector<long long> occurrence_counts() const` | Returns total occurrence counts by node id. | `O(D)` |
-| `pair<int, int> first_occurrence(id) const` | Returns its first half-open interval. | `O(1)` |
+| `std::vector<long long> occurrence_counts() const` | Returns total occurrence counts by node id. | `O(D)` |
+| `std::pair<int, int> first_occurrence(id) const` | Returns its first half-open interval. | `O(1)` |
 
 Here `P` is the number of reported palindromic suffixes.
 

@@ -26,7 +26,7 @@ continue to use the persistent-returning interface.
 
 * `T`: The underlying data type of the elements.
 
-## Constructors
+## Construction
 
 * `PersistentDynamicArray()`
   Constructs an empty array. ($O(1)$)

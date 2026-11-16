@@ -23,7 +23,7 @@ inactive edges is treated as isolated.
 The traversal is iterative, so a path with hundreds of thousands of vertices
 does not consume the call stack.
 
-## API
+## Interface
 
 ```cpp
 struct BiconnectedComponentsResult {

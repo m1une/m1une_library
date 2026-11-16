@@ -16,7 +16,7 @@ endpoints. The `link_edge` helper does this for you.
 The implementation supports non-commutative monoids. `prod(u, v)` returns the
 product in path order from `u` to `v`.
 
-## Template Parameter
+## Template Parameters
 
 `Monoid` must satisfy `m1une::monoid::IsMonoid`:
 
@@ -74,7 +74,7 @@ is available.
 | `T prod(u, v)` | Returns the monoid product on the path from `u` to `v`. | Amortized $O(\log N)$ |
 | `T path_prod(u, v)` | Alias for `prod(u, v)`. | Amortized $O(\log N)$ |
 | `int path_size(u, v)` | Number of link-cut-tree vertices on the path from `u` to `v`. | Amortized $O(\log N)$ |
-| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-indexed. | Amortized $O(\log N)$ |
+| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-based. | Amortized $O(\log N)$ |
 | `int lca(u, v)` | Returns the LCA with respect to the current represented root, or `-1` if disconnected. | Amortized $O(\log N)$ |
 
 `prod`, `path_size`, and `kth_vertex` require `u` and `v` to be connected.

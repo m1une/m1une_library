@@ -43,7 +43,7 @@ template <
 struct Wrapper;
 ```
 
-## Required callables
+## Required Callables
 
 | Parameter | Required behavior |
 | --- | --- |
@@ -76,7 +76,7 @@ Returning `false` is always correct when descent is safe, but unnecessary
 failures make operations slower. A useful predicate therefore recognizes as
 many constant-time aggregate updates as the stored information permits.
 
-## Optional callables
+## Optional Callables
 
 The five optional callable template arguments expose hooks used by
 `SegtreeBeats` when they are present.
@@ -98,7 +98,7 @@ When constructing `SegtreeBeats` from `std::vector<U>`, the tree prefers
 `make(value)`, then `make(value, index)`, then conversion to `T`. Usually only
 one of `Make` and `MakeAt` should be supplied.
 
-## Interface and complexity
+## Interface and Complexity
 
 | Method | Description | Complexity |
 | --- | --- | --- |

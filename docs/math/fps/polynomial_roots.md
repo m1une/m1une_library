@@ -25,7 +25,7 @@ two is handled directly; odd prime fields use the randomized splitter.
 The zero polynomial has every field element as a root and is rejected by an
 assertion. A nonzero constant has no roots. Repeated roots are returned once.
 
-## Public Interface
+## Interface
 
 ```cpp
 template <class Mint>

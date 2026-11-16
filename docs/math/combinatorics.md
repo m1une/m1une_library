@@ -108,7 +108,7 @@ binom(n, k) = factorial[n]
               modulo mod.
 ```
 
-## API
+## Interface
 
 ```cpp
 template <class Mint>

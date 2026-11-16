@@ -32,7 +32,7 @@ second input is already below the half-size boundary, the result is the
 identity; otherwise the block strictly decreases its degree. This convention
 lets the full GCD routine alternate half-GCD blocks with single Euclidean steps.
 
-## Public Interface
+## Interface
 
 Let `Fps` denote `FormalPowerSeries<Mint>`.
 

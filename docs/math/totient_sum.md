@@ -60,7 +60,7 @@ $$
 The `TotientSum` object memoizes large recursive states, so it is suitable for
 multiple queries.
 
-## API
+## Interface
 
 ```cpp
 struct TotientSum {

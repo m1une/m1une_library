@@ -27,13 +27,31 @@ $$\text{new\_inversions} = (\text{zeros} \times \text{ones}) - \text{old\_invers
 ## Element Creation
 
 When initializing the lazy segment tree, you must transform the raw binary values (`0` or `1`) into valid monoid nodes.
-**Always use the `make(val)` helper method** to securely build the leaf nodes.
+Use `make(val)` to build a leaf with the correct zero/one counts.
 
 ### `static constexpr value_type make(int val)`
 
 * **Parameters:**
   * `val`: The binary element value (`0` or `1`).
 * **Returns:** A `BinaryInversionNode` properly initialized for a single element.
+
+## Interface and Complexity
+
+```cpp
+using value_type = m1une::monoid::BinaryInversionNode<T>;
+using operator_type = bool;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the empty value-monoid identity. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(1)$ |
+| `static constexpr operator_type op_id()` | Returns the identity update. | $O(1)$ |
+| `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)` | Composes updates: apply `g` first, then `f`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Returns the aggregate after applying `f`; does not modify `x`. | $O(1)$ |
+| `static constexpr value_type make(int val)` | Creates a one-element aggregate. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
 
 ## Example
 
@@ -74,13 +92,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless acted-monoid tag. Lazy data structures use its public
-`value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
-and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
-reversal-aware mappings are described above when the header provides them.
-
-The static operations are $O(1)$ for the scalar metadata stored by these range
-acted monoids, aside from the cost of the underlying arithmetic type.

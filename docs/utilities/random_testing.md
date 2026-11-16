@@ -15,7 +15,7 @@ From your contest directory, name the files `main.cpp`, `brute.cpp`, and
 `gen.cpp`, then run:
 
 ```sh
-python3 /Users/Reito/Desktop/atcoder/m1une_library/stress.py
+python3 /path/to/m1une_library/stress.py
 ```
 
 The only generator convention is `gen <seed>`: read an unsigned 64-bit decimal
@@ -88,16 +88,16 @@ is the authoritative reproducer even after code or toolchain changes.
 
 ```sh
 # Run from your contest directory; the library include path is added for you.
-python3 /Users/Reito/Desktop/atcoder/m1une_library/stress.py C.cpp brute.cpp gen.cpp --seed 123 --cases 10000
+python3 /path/to/m1une_library/stress.py C.cpp brute.cpp gen.cpp --seed 123 --cases 10000
 
 # With main.cpp/brute.cpp/gen.cpp, positional arguments can be omitted.
-python3 /Users/Reito/Desktop/atcoder/m1une_library/stress.py --cases 10000
+python3 /path/to/m1une_library/stress.py --cases 10000
 ```
 
 An optional shell alias makes the usual invocation `stress --cases 10000`:
 
 ```sh
-alias stress='python3 /Users/Reito/Desktop/atcoder/m1une_library/stress.py'
+alias stress='python3 /path/to/m1une_library/stress.py'
 ```
 
 ### Options and build behavior
@@ -187,9 +187,15 @@ using namespace m1une::utilities;
 
 ## Non-Interactive and Constructive Recipe
 
-Write these three pieces:
+Replace the generator, solution, and checker bodies below with your problem logic.
+The complete sorting example follows this skeleton.
 
 ```cpp
+#include "utilities/random_testing.hpp"
+#include <iostream>
+
+using namespace m1une::utilities;
+
 auto generate = [](Random& random, std::ostream& input) {
     // Write one small random case to input.
 };

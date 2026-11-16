@@ -42,9 +42,9 @@ all values are omitted, so $0 \le L \le B$ and equal values have $L = 0$.
 ## Construction
 
 * `WaveletMatrixSum()`: creates an empty matrix.
-* `WaveletMatrixSum(const vector<T>& values)`: uses each value as its own
+* `WaveletMatrixSum(const std::vector<T>& values)`: uses each value as its own
   weight. This requires `T` to be convertible to `Sum`.
-* `WaveletMatrixSum(const vector<T>& values, const vector<Sum>& weights)`:
+* `WaveletMatrixSum(const std::vector<T>& values, const std::vector<Sum>& weights)`:
   associates `weights[i]` with `values[i]`.
 
 The value and weight vectors must have equal lengths. Construction takes
@@ -66,8 +66,8 @@ All index and value intervals are half-open.
 | `T kth_largest(int l, int r, int k)` | Returns the zero-based `k`-th largest value. | $O(L)$ |
 | `int range_freq(int l, int r, T upper)` | Counts values less than `upper`. | $O(L)$ |
 | `int range_freq(int l, int r, T lower, T upper)` | Counts values in `[lower, upper)`. | $O(L)$ |
-| `optional<T> prev_value(int l, int r, T upper)` | Returns the greatest value less than `upper`, or `nullopt`. | $O(L)$ |
-| `optional<T> next_value(int l, int r, T lower)` | Returns the smallest value at least `lower`, or `nullopt`. | $O(L)$ |
+| `std::optional<T> prev_value(int l, int r, T upper)` | Returns the greatest value less than `upper`, or `nullopt`. | $O(L)$ |
+| `std::optional<T> next_value(int l, int r, T lower)` | Returns the smallest value at least `lower`, or `nullopt`. | $O(L)$ |
 | `Sum range_sum(int l, int r)` | Returns the total weight in `[l, r)`. | $O(1)$ |
 | `Sum range_sum(int l, int r, T upper)` | Sums weights whose values are less than `upper`. | $O(L)$ |
 | `Sum range_sum(int l, int r, T lower, T upper)` | Sums weights whose values are in `[lower, upper)`. | $O(L)$ |

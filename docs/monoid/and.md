@@ -18,11 +18,25 @@ A monoid representing the bitwise AND operation.
 
 ## Interface and Complexity
 
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `id()`, and `op(a, b)` members. If the type also provides helpers
-such as `make(...)` or `inv(x)`, they are described above or in the documented
-properties.
+```cpp
+using value_type = T;
+```
 
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr T id()` | Returns `~T(0)` (all bits set). | $O(1)$ |
+| `static constexpr T op(const T& a, const T& b)` | Returns the bitwise AND. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
+## Example
+
+```cpp
+#include "monoid/and.hpp"
+#include <cassert>
+
+int main() {
+    using M = m1une::monoid::And<unsigned int>;
+    assert(M::op(6, 3) == 2);
+}
+```

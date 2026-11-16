@@ -60,7 +60,7 @@ $O(N+R^3)$ Chazelle--Dobkin algorithm. Use
 [`minimum_convex_decomposition`](https://m1une.github.io/m1une_library/geometry/convex_decomposition.hpp) when minimum
 cardinality is required and Steiner points are forbidden.
 
-## Input and output rules
+## Input and Output Rules
 
 Only floating-point coordinate types are supported. Steiner intersections need
 not be integral even when all input coordinates are integers, so an integral

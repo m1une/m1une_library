@@ -37,7 +37,7 @@ existing component can be checked.
 
 Indices must lie in `[0, size())`. A rollback token must be active.
 
-## Snapshot semantics
+## Snapshot Semantics
 
 Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 

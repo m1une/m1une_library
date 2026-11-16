@@ -27,7 +27,7 @@ positions and receive merge time `M + 1`.
 The SCC traversals are iterative; only the divide-and-conquer recursion remains,
 and its depth is `O(log(M + 1))`. The function does not mutate the graph.
 
-## API
+## Interface
 
 ```cpp
 template <class T>

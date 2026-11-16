@@ -51,7 +51,7 @@ Let $B = \mathtt{BITS}$.
 | `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Applies `f` to an aggregate. | $O(B)$ |
 | `static constexpr value_type make(const T& value)` | Constructs a one-element aggregate. | $O(B)$ |
 | `static constexpr operator_type make_and(const T& mask)` | Constructs the update $x \gets x \mathbin{\&} \mathtt{mask}$. | $O(1)$ |
-| `static constexpr operator_type make_or(const T& mask)` | Constructs the update $x \gets x \mathbin{|} \mathtt{mask}$. | $O(1)$ |
+| `static constexpr operator_type make_or(const T& mask)` | Constructs the update $x \gets x \mathbin{\vert} \mathtt{mask}$. | $O(1)$ |
 | `static constexpr operator_type make_xor(const T& mask)` | Constructs the update $x \gets x \mathbin{\hat{}} \mathtt{mask}$. | $O(1)$ |
 
 With `LazySegtree`, construction takes $O(NB)$, a range update takes

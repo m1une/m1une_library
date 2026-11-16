@@ -21,7 +21,7 @@ In this document:
 
 * `Monoid`: A monoid satisfying `m1une::monoid::IsMonoid`.
 
-## Constructors
+## Construction
 
 * `DynamicMonoidArray()`
   Constructs an empty sequence. ($O(1)$)

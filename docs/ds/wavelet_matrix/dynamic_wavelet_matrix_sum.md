@@ -45,8 +45,8 @@ occasionally split or merge.
 | Constructor | Description | Complexity |
 | --- | --- | --- |
 | `DynamicWaveletMatrixSum()` | Constructs an empty sequence. | $O(B)$ |
-| `explicit DynamicWaveletMatrixSum(const vector<T>& values)` | Builds keys from `values` and uses each key as its weight. | $O(BN)$ |
-| `DynamicWaveletMatrixSum(const vector<T>& values, const vector<Sum>& weights)` | Builds separate keys and weights; the vector lengths must match. | $O(BN)$ |
+| `explicit DynamicWaveletMatrixSum(const std::vector<T>& values)` | Builds keys from `values` and uses each key as its weight. | $O(BN)$ |
+| `DynamicWaveletMatrixSum(const std::vector<T>& values, const std::vector<Sum>& weights)` | Builds separate keys and weights; the vector lengths must match. | $O(BN)$ |
 
 ## Sequence Methods
 
@@ -58,12 +58,12 @@ occasionally split or merge.
 | `T access(int position) const` | Returns the key at `position`. | Expected $O(B\log N)$ |
 | `T operator[](int position) const` | Equivalent to `access(position)`. | Expected $O(B\log N)$ |
 | `Sum weight(int position) const` | Returns the weight at `position`. | Expected $O(\log N)$ |
-| `pair<T, Sum> get(int position) const` | Returns the key and weight at `position`. | Expected $O(B\log N)$ |
+| `std::pair<T, Sum> get(int position) const` | Returns the key and weight at `position`. | Expected $O(B\log N)$ |
 | `void insert(int position, T value)` | Inserts `value` as both key and weight before `position`. | Expected amortized $O(B\log N)$ |
 | `void insert(int position, T value, const Sum& weight)` | Inserts a separate key and weight before `position`. | Expected amortized $O(B\log N)$ |
 | `void push_back(T value)` | Appends `value` as both key and weight. | Expected amortized $O(B\log N)$ |
 | `void push_back(T value, const Sum& weight)` | Appends a separate key and weight. | Expected amortized $O(B\log N)$ |
-| `pair<T, Sum> erase(int position)` | Erases and returns the key and weight at `position`. | Expected amortized $O(B\log N)$ |
+| `std::pair<T, Sum> erase(int position)` | Erases and returns the key and weight at `position`. | Expected amortized $O(B\log N)$ |
 | `void set(int position, T value)` | Replaces both the key and weight with `value`. | Expected amortized $O(B\log N)$ |
 | `void set(int position, T value, const Sum& weight)` | Replaces both the key and weight. | Expected amortized $O(B\log N)$ |
 | `void set_value(int position, T value)` | Replaces the key and preserves the weight. | Expected amortized $O(B\log N)$ |
@@ -85,8 +85,8 @@ All index and key intervals are half-open.
 | `T kth_largest(int left, int right, int k) const` | Returns the zero-based `k`-th largest key. | Expected $O(B\log N)$ |
 | `int range_freq(int left, int right, T upper) const` | Counts keys less than `upper`. | Expected $O(B\log N)$ |
 | `int range_freq(int left, int right, T lower, T upper) const` | Counts keys in `[lower, upper)`. | Expected $O(B\log N)$ |
-| `optional<T> prev_value(int left, int right, T upper) const` | Returns the greatest key below `upper`, or `nullopt`. | Expected $O(B\log N)$ |
-| `optional<T> next_value(int left, int right, T lower) const` | Returns the smallest key at least `lower`, or `nullopt`. | Expected $O(B\log N)$ |
+| `std::optional<T> prev_value(int left, int right, T upper) const` | Returns the greatest key below `upper`, or `nullopt`. | Expected $O(B\log N)$ |
+| `std::optional<T> next_value(int left, int right, T lower) const` | Returns the smallest key at least `lower`, or `nullopt`. | Expected $O(B\log N)$ |
 | `Sum range_sum(int left, int right) const` | Sums every weight in the index interval. | Expected $O(\log N)$ |
 | `Sum range_sum(int left, int right, T upper) const` | Sums weights whose keys are less than `upper`. | Expected $O(B\log N)$ |
 | `Sum range_sum(int left, int right, T lower, T upper) const` | Sums weights whose keys are in `[lower, upper)`. | Expected $O(B\log N)$ |

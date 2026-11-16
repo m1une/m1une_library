@@ -18,7 +18,7 @@ This is the library's generic meaning of Segment Tree Beats. It is not tied to
 Use `LazySegtree<ActedMonoid>` when every valid action always maps an aggregate
 directly. Its simpler contract gives the usual $O(\log N)$ update bound.
 
-## Beats acted monoid
+## Beats Acted Monoid
 
 `ActedMonoid` must satisfy
 `m1une::beats_acted_monoid::IsBeatsActedMonoid` and provide:
@@ -57,7 +57,7 @@ The exact applicability contract is:
 Padded leaves are excluded by the data structure and do not impose an
 application-specific `can_apply` requirement.
 
-## Optional index-aware operations
+## Optional Index-Aware Operations
 
 The following overloads are detected automatically:
 
@@ -83,7 +83,7 @@ available, then `ActedMonoid::make(value, index)`, then conversion to
 from `constexpr` lambdas or function objects. It can also forward optional
 `make`, index-aware mapping/applicability, and shifting functions.
 
-## Public interface
+## Interface
 
 All indices are zero-based and all ranges are half-open.
 

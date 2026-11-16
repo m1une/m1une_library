@@ -18,7 +18,7 @@ fallible action with an acted monoid.
 representable by `T`; its minimum and maximum values are reserved internally as
 sentinels.
 
-## Public interface
+## Interface
 
 All indices are zero-based and all ranges are half-open.
 

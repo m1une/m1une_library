@@ -17,7 +17,7 @@ A convenient wrapper around `std::vector` that allows arbitrary index ranges, in
 | --- | --- | --- |
 | `ShiftedArray(long long L, long long R, T init_value = T(), long long step = 1)` | Constructs an array for indices `L, L + step, ... , R`. `init_value` is used for every stored element. | Throws `std::invalid_argument` if `step <= 0` or `L > R`. |
 | `T& operator[](long long i)` | Accesses the element at shifted index `i`. | $O(1)$; throws `std::out_of_range` if `i` is outside the configured bounds or is not aligned to `step`. |
-| `long long index(long long i) const` | Returns the internal 0-based vector index for shifted index `i`. | $O(1)$; throws `std::out_of_range` if `i` is outside the configured bounds or is not aligned to `step`. |
+| `long long index(long long i) const` | Returns the internal zero-based vector index for shifted index `i`. | $O(1)$; throws `std::out_of_range` if `i` is outside the configured bounds or is not aligned to `step`. |
 
 ## Example
 

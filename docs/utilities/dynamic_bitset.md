@@ -29,8 +29,8 @@ Bits are packed into 64-bit blocks. Single-bit access is constant time, while bu
 | `bool any() const` | Returns `true` if at least one bit is set. | $O(N / 64)$ |
 | `bool all() const` | Returns `true` if all logical bits are set. For size `0`, this returns `true`. | $O(N / 64)$ |
 | `bool none() const` | Returns `true` if no bit is set. | $O(N / 64)$ |
-| `operator&=`, `operator|=`, `operator^=` | Performs an in-place bitwise operation with another bitset of the same size. | $O(N / 64)$ |
-| `operator&`, `operator|`, `operator^`, `operator~` | Returns the result of a bitwise operation. | $O(N / 64)$ |
+| `operator&=`, `operator\|=`, `operator^=` | Performs an in-place bitwise operation with another bitset of the same size. | $O(N / 64)$ |
+| `operator&`, `operator\|`, `operator^`, `operator~` | Returns the result of a bitwise operation. | $O(N / 64)$ |
 
 ## Notes
 

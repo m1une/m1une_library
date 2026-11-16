@@ -19,7 +19,7 @@ The multidimensional classes store their prefix tables in contiguous memory.
 The input is interpreted as row-major `values[y][x]` in 2D and
 `values[z][y][x]` in 3D. Input rows and planes must form a rectangular grid.
 
-## Template Requirements
+## Requirements
 
 * `T{}` must be the additive identity.
 * `T` must support addition and subtraction, with the usual additive-group

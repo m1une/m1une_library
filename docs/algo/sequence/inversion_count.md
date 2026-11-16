@@ -17,9 +17,9 @@ $N(N-1)/2$ inversions.
 
 * `T`: Element type. Values must be comparable using `<`.
 
-## Methods
+## Functions
 
-| Method | Description | Complexity |
+| Function | Description | Complexity |
 | --- | --- | --- |
 | `long long inversion_count(std::vector<T> a)` | Returns the total number of inversions. The argument is taken by value. Use `std::move(a)` if you no longer need the original array to avoid an $O(N)$ copy. | $O(N \log N)$ time, $O(N)$ space |
 

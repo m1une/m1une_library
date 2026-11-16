@@ -36,7 +36,7 @@ Create a graph with the number of vertices, then add edges.
 
 * Use `add_directed_edge(from, to, cost)` for a one-way edge.
 * Use `add_edge(u, v, cost)` for an undirected edge.
-* Vertices are zero-indexed.
+* Vertices are zero-based.
 * The returned edge id is stable and shared by the two arcs of an undirected
   edge.
 

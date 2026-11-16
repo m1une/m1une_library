@@ -38,7 +38,7 @@ occurrences.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
-| `insert(pattern)` | Inserts a pattern and returns its ID. | $O(|pattern|)$ |
+| `insert(pattern)` | Inserts a pattern and returns its ID. | $O(\lvert pattern \rvert)$ |
 | `build()` | Builds failure links and all transitions. | $O(K\sigma)$ |
 | `built()` | Returns whether `build()` has been called. | $O(1)$ |
 | `pattern_count()` | Returns the number of inserted patterns. | $O(1)$ |

@@ -9,6 +9,22 @@ Browse the library files below for interfaces, complexity bounds, examples,
 and verification results. The source is available on
 [GitHub](https://github.com/m1une/m1une_library).
 
+### Getting started
+
+Read the [library guide and conventions](https://m1une.github.io/m1une_library/guide.html)
+for a complete first example, range-data-structure selection, indexing,
+complexity notation, and persistent/rollback behavior.
+The category guides below provide a route into the reference.
+
+| Category | Guide |
+| --- | --- |
+| General algorithms | [Sequences, search, enumeration, offline processing, and DP](https://m1une.github.io/m1une_library/algo/all.hpp) |
+| Data structures | [Categorized header index](https://github.com/m1une/m1une_library/blob/main/ds/README.md) |
+| Graphs and trees | [Graph algorithms](https://m1une.github.io/m1une_library/graph/all.hpp) and [tree algorithms](https://m1une.github.io/m1une_library/graph/tree/all.hpp) |
+| Convex optimization | [Convex tools](https://m1une.github.io/m1une_library/convex/all.hpp) and [Monge selection guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp) |
+| Mathematics | [Number theory, polynomials, and matrices](https://m1une.github.io/m1une_library/math/all.hpp) |
+| Other domains | [Strings](https://m1une.github.io/m1une_library/string/all.hpp), [geometry](https://m1une.github.io/m1une_library/geometry/all.hpp), [games](https://m1une.github.io/m1une_library/game/all.hpp), [matroids](https://m1une.github.io/m1une_library/matroid/all.hpp), [optimization](https://m1une.github.io/m1une_library/optimization/all.hpp), and [heuristics](https://m1une.github.io/m1une_library/heuristic/all.hpp) |
+
 ### Use and rights
 
 m1une dedicates this library and its documentation to the public domain under
@@ -32,6 +48,7 @@ open a [GitHub issue](https://github.com/m1une/m1une_library/issues) or contact
 みうねが作成している、競技プログラミング向けのヘッダーオンリー C++20 ライブラリです。
 下のファイル一覧から、各機能の使い方・計算量・使用例・検証結果を確認できます。
 ソースコードは [GitHub](https://github.com/m1une/m1une_library) で公開しています。
+[利用ガイドと表記の規約](https://m1une.github.io/m1une_library/guide.html)から、基本的な使い方やデータ構造の選び方を確認できます。
 各機能のドキュメントは英語で記載しています。必要に応じて翻訳をご利用ください。
 
 ### 利用と権利

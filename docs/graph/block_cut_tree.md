@@ -28,7 +28,7 @@ Block nodes have IDs in `[0, block_count())`, in the same order as
 `BiconnectedComponentsResult::components`. Articulation nodes follow block
 nodes, in increasing order of the original vertex ID.
 
-## API
+## Interface
 
 ```cpp
 struct BlockCutTreeResult {

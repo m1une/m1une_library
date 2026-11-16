@@ -19,7 +19,7 @@ The implementation uses skew-symmetric Gaussian elimination.
 `T` must be a field type supporting construction from `0` and `1`, equality,
 addition, subtraction, multiplication, and division by a nonzero value.
 
-## API
+## Interface
 
 ```cpp
 template <class T>

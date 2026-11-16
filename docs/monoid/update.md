@@ -15,11 +15,26 @@ When two operations are composed, the newer operation (on the left, when applied
 
 ## Interface and Complexity
 
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `id()`, and `op(a, b)` members. If the type also provides helpers
-such as `make(...)` or `inv(x)`, they are described above or in the documented
-properties.
+```cpp
+using value_type = std::optional<T>;
+```
 
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns `std::nullopt`. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Returns `a` if present, otherwise `b`; the left assignment wins. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
+## Example
+
+```cpp
+#include "monoid/update.hpp"
+#include <cassert>
+
+int main() {
+    using M = m1une::monoid::Update<int>;
+    assert(M::op(7, 3).value() == 7);
+    assert(M::op(M::id(), 3).value() == 3);
+}
+```

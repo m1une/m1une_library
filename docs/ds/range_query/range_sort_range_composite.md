@@ -30,7 +30,7 @@ before construction when the original key values are arbitrary.
 `Monoid::op` need not be commutative. Products preserve the current left-to-right
 sequence order.
 
-## Public Interface
+## Interface
 
 | Method | Description | Complexity |
 | --- | --- | --- |

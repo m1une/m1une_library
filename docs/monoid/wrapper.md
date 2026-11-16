@@ -5,7 +5,8 @@ documentation_of: ../../monoid/wrapper.hpp
 
 ## Overview
 
-An adapter struct that easily generates a monoid from given functions or stateless lambdas using C++20 Non-Type Template Parameters (NTTP). This is extremely useful in competitive programming contests to define custom monoids (e.g., for Segment Trees) with minimal boilerplate code.
+Defines a monoid from callables supplied as C++20 non-type template parameters.
+Use it for a short custom operation without declaring a separate struct.
 
 ## Template Parameters
 
@@ -13,6 +14,17 @@ An adapter struct that easily generates a monoid from given functions or statele
 * `Op`: A callable object (function pointer or stateless lambda) that takes two arguments of type `T` and returns a value of type `T`.
 * `Id`: A callable object (function pointer or stateless lambda) that takes no arguments and returns the identity element of type `T`.
 * `Commutative`: Whether `Op` is commutative. Defaults to `false`.
+
+## Interface and Complexity
+
+```cpp
+using value_type = T;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr T id()` | Returns `Id()`. | Cost of `Id()` |
+| `static constexpr T op(const T& a, const T& b)` | Returns `Op(a, b)`. | Cost of `Op(a, b)` |
 
 ## Example
 
@@ -35,14 +47,3 @@ constexpr auto custom_op = [](long long a, long long b) { return a + b; };
 constexpr auto custom_id = []() { return 0LL; };
 using CustomMonoid = m1une::monoid::Wrapper<long long, custom_op, custom_id>;
 ```
-
-## Interface and Complexity
-
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `commutative`, `id()`, and `op(a, b)` members. If the type also
-provides helpers such as `make(...)` or `inv(x)`, they are described above or in
-the documented properties.
-
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.

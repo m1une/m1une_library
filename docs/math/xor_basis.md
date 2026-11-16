@@ -15,7 +15,7 @@ XORing a subset of the inserted values.
 
 The class is in `m1une::math`.
 
-## Template Requirements
+## Requirements
 
 ```cpp
 template <std::unsigned_integral UInt = unsigned long long>

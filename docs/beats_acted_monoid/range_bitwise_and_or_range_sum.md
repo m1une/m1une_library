@@ -22,7 +22,7 @@ f(x) = (x & and_mask) | or_mask;
 
 Use `make_and` and `make_or` instead of constructing an operator directly.
 
-## Template requirements
+## Requirements
 
 * `T` must be a non-boolean integral type. Values are nonnegative, occupy only
   the lowest `BITS` bits, and have range sums representable by `T`.
@@ -40,7 +40,7 @@ long long length;
 
 `operator_type` has public members `T and_mask` and `T or_mask`.
 
-## Interface and complexity
+## Interface and Complexity
 
 Every acted-monoid operation takes $O(1)$ time, independently of `BITS`.
 
@@ -55,7 +55,7 @@ Every acted-monoid operation takes $O(1)$ time, independently of `BITS`.
 | `static value_type mapping(const operator_type& f, const value_type& x)` | Applies an update after `can_apply` succeeds. | $O(1)$ |
 | `static value_type make(const T& value)` | Constructs a one-element aggregate. | $O(1)$ |
 | `static operator_type make_and(const T& mask)` | Constructs `x = x & mask`. | $O(1)$ |
-| `static operator_type make_or(const T& mask)` | Constructs `x = x | mask`. | $O(1)$ |
+| `static operator_type make_or(const T& mask)` | Constructs `x = x \| mask`. | $O(1)$ |
 
 With `SegtreeBeats`, an operation takes $O(\log N+D)$, where $D$ is the number
 of extra nodes visited because a changed bit is mixed. Read a query result from

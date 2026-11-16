@@ -35,7 +35,7 @@ use, `T` is a modular integer type. `PrimePower` must be callable as
 The argument `n` and all intermediate prime powers must fit in `uint64_t`.
 The table has about `2 * sqrt(n)` entries and its size must fit in `int`.
 
-## API
+## Interface
 
 ```cpp
 template <class T, class PrimePower>

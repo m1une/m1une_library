@@ -85,9 +85,9 @@ $$
 | Function | Input at mask `S` | Output at mask `S` | Time |
 | --- | --- | --- | --- |
 | `subset_zeta_transform(values)` | $f(S)$ | $\sum_{T \subseteq S} f(T)$ | $O(N \log N)$ |
-| `subset_mobius_transform(values)` | $F(S)$ | $\sum_{T \subseteq S} (-1)^{|S \setminus T|} F(T)$ | $O(N \log N)$ |
+| `subset_mobius_transform(values)` | $F(S)$ | $\sum_{T \subseteq S} (-1)^{\lvert S \setminus T \rvert} F(T)$ | $O(N \log N)$ |
 | `superset_zeta_transform(values)` | $f(S)$ | $\sum_{T \supseteq S} f(T)$ | $O(N \log N)$ |
-| `superset_mobius_transform(values)` | $G(S)$ | $\sum_{T \supseteq S} (-1)^{|T \setminus S|} G(T)$ | $O(N \log N)$ |
+| `superset_mobius_transform(values)` | $G(S)$ | $\sum_{T \supseteq S} (-1)^{\lvert T \setminus S \rvert} G(T)$ | $O(N \log N)$ |
 
 For example, let the masks `0`, `1`, `2`, and `3` represent $\varnothing$,
 $\{0\}$, $\{1\}$, and $\{0, 1\}$, respectively. Starting with

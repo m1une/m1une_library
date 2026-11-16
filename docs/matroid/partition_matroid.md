@@ -23,8 +23,8 @@ Oracle inputs must contain distinct valid ground-set indices.
 | `int group_count() const` | Returns the number of groups. | $O(1)$ |
 | `const std::vector<int>& groups() const` | Returns the group of every element. | $O(1)$ |
 | `const std::vector<int>& capacities() const` | Returns the capacities. | $O(1)$ |
-| `bool independent(const std::vector<int>& subset) const` | Checks all group capacities. | $O(G+|S|)$ |
-| `bool operator()(const std::vector<int>& subset) const` | Independence-oracle shorthand. | $O(G+|S|)$ |
+| `bool independent(const std::vector<int>& subset) const` | Checks all group capacities. | $O(G+\lvert S \rvert)$ |
+| `bool operator()(const std::vector<int>& subset) const` | Independence-oracle shorthand. | $O(G+\lvert S \rvert)$ |
 
 ## Example
 

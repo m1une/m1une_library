@@ -31,7 +31,7 @@ nonzero and the points must be distinct. Equivalently, `ratio.pow(k) != 1` for
 every `1 <= k < values.size()`. These conditions are asserted. It is valid for
 `ratio.pow(values.size()) == 1`.
 
-## Public Interface
+## Interface
 
 ```cpp
 template <class Mint>

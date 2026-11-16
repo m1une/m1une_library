@@ -16,9 +16,9 @@ non-decreasing subsequence.
 
 * `T`: Element type. Values must be comparable using `<`.
 
-## Methods
+## Functions
 
-| Method | Description | Complexity |
+| Function | Description | Complexity |
 | --- | --- | --- |
 | `std::vector<int> lis(const std::vector<T>& a, bool strict = true)` | Returns the indices of the LIS. If `strict` is `true`, finds a strictly increasing sequence. If `false`, allows adjacent elements in the sequence to be equal (non-decreasing). | $O(N \log N)$ time, $O(N)$ space |
 

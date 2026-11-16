@@ -25,7 +25,7 @@ f(x) = clamp(x + add, lower, upper);
 Use `make_chmin`, `make_chmax`, and `make_add` instead of constructing that
 operator directly.
 
-## Template requirements
+## Requirements
 
 `T` must satisfy `std::signed_integral` and defaults to `long long`. All values,
 sums, differences, products by segment lengths, accumulated additions, and
@@ -49,7 +49,7 @@ For a constant nonempty segment, `second_maximum` is
 `std::numeric_limits<T>::lowest()` and `second_minimum` is
 `std::numeric_limits<T>::max()`.
 
-## Interface and complexity
+## Interface and Complexity
 
 Every acted-monoid operation below takes $O(1)$ time.
 
