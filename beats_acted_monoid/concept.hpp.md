@@ -126,3 +126,11 @@ identity operator must always be applicable and leave values unchanged.
 Optional three-argument `can_apply` and `mapping` overloads and optional
 `op_shift` are recognized by `SegtreeBeats`; they are not additional concept
 requirements.
+
+## Complexity
+
+The concept is a compile-time interface check with no runtime cost. The costs
+of `can_apply` and `mapping` belong to the supplied action. A Beats tree may
+visit many children after a failed `can_apply`, so its update complexity needs
+an action-specific amortized analysis; the concept alone gives no logarithmic
+bound.

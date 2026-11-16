@@ -66,6 +66,25 @@ An acted monoid that supports range bitwise XOR operations and range XOR sum que
 
 When a value $f$ is XORed to all elements in a segment, the total XOR sum of the segment changes by $f$ only if the segment's length is odd. Therefore, `value_type` holds the size of the segment. Use the `make(val)` helper function to initialize leaf nodes.
 
+## Interface and Complexity
+
+```cpp
+using value_type = RangeXorRangeXorNode<T>;
+using operator_type = T;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the empty value-monoid identity. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(1)$ |
+| `static constexpr value_type inv(const value_type& x)` | Returns the group inverse of `x`. | $O(1)$ |
+| `static constexpr operator_type op_id()` | Returns the identity update. | $O(1)$ |
+| `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)` | Composes updates: apply `g` first, then `f`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Returns the aggregate after applying `f`; does not modify `x`. | $O(1)$ |
+| `static constexpr value_type make(const T& val)` | Creates a one-element aggregate. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
 ## Example
 
 ```cpp
@@ -94,13 +113,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless acted-monoid tag. Lazy data structures use its public
-`value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
-and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
-reversal-aware mappings are described above when the header provides them.
-
-The static operations are $O(1)$ for the scalar metadata stored by these range
-acted monoids, aside from the cost of the underlying arithmetic type.

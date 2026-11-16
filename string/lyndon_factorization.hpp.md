@@ -106,8 +106,8 @@ All functions are generic over indexable sequences such as `std::string` and
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `vector<int> lyndon_factor_boundaries(const Sequence& sequence)` | Returns boundaries `0 = a[0] < a[1] < ... < a[k] = N`. | $O(N)$ |
-| `vector<pair<int, int>> lyndon_factorization(const Sequence& sequence)` | Returns the factor intervals as half-open ranges `[left, right)`. | $O(N)$ |
+| `std::vector<int> lyndon_factor_boundaries(const Sequence& sequence)` | Returns boundaries `0 = a[0] < a[1] < ... < a[k] = N`. | $O(N)$ |
+| `std::vector<std::pair<int, int>> lyndon_factorization(const Sequence& sequence)` | Returns the factor intervals as half-open ranges `[left, right)`. | $O(N)$ |
 | `int minimum_cyclic_shift(const Sequence& sequence)` | Compatibility re-export from `minimum_rotation.hpp`; returns the earliest minimum cyclic shift. | $O(N)$ |
 
 For an empty sequence, `lyndon_factor_boundaries` returns `{0}`,

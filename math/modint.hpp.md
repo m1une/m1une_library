@@ -1003,7 +1003,7 @@ For convenience, the library provides the following common type aliases:
 * `using modint998244353 = ModInt<998244353>;`
 * `using modint1000000007 = ModInt<1000000007>;`
 
-## Constructors
+## Construction
 
 | Constructor | Description | Complexity |
 | --- | --- | --- |

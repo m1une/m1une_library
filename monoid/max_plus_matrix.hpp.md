@@ -84,6 +84,33 @@ In this algebra, the standard addition operation is replaced by `std::max`, and 
 
 This is highly effective for solving **Dynamic DP** problems (where state transitions involve taking the maximum of sums) or finding longest paths over dynamic edge weights on a Segment Tree.
 
+## Requirements
+
+`MaxPlusMatrix<T, N, MinInf>` uses a fixed dimension `N >= 0`. `T` must support
+addition and ordered comparison. The sentinel defaults to
+`std::numeric_limits<T>::lowest() / 2` and represents an unreachable transition;
+it must be reserved and lie beyond every finite result in the optimization
+direction. All finite intermediate sums must fit in `T`.
+
+The product is `a * b`. With column-vector states, `b` acts first, then `a`;
+a left-to-right segment-tree product applies the rightmost transition first.
+
+## Interface and Complexity
+
+```cpp
+using value_type = std::array<std::array<T, N>, N>;
+```
+
+Here $N$ is the matrix dimension, rather than the number of array elements.
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns zero on the diagonal and `MinInf` elsewhere. | $O(N^2)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Returns `res[i][j] = max_k(a[i][k] + b[k][j])`, skipping infinity entries. | $O(N^3)$ |
+| `static constexpr value_type make_inf()` | Returns a matrix with every entry set to the infinity sentinel. | $O(N^2)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
 ## Example
 
 ```cpp
@@ -115,14 +142,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `id()`, and `op(a, b)` members. If the type also provides helpers
-such as `make(...)` or `inv(x)`, they are described above or in the documented
-properties.
-
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.

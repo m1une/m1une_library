@@ -443,22 +443,22 @@ an integral weight type other than `bool`.
 | `long long uniform(long long l, long long r)` | Returns a uniformly random integer in the closed interval `[l, r]`. | $O(1)$ |
 | `unsigned long long uniform_unsigned(unsigned long long l, unsigned long long r)` | Returns a uniformly random unsigned integer in `[l, r]`. | $O(1)$ |
 | `double real(double l = 0.0, double r = 1.0)` | Returns a uniformly random real value in `[l, r)`. | $O(1)$ |
-| `vector<T> sequence(int size, T lower, T upper)` | Generates independent values in the closed interval. | $O(\text{size})$ |
+| `std::vector<T> sequence(int size, T lower, T upper)` | Generates independent values in the closed interval. | $O(\text{size})$ |
 | `string string(int length, string_view alphabet)` | Generates a string from `alphabet`; lowercase letters are the default. | $O(\text{length})$ |
-| `vector<int> permutation(int size, int first = 0)` | Returns a shuffled permutation of `[first, first + size)`. | $O(\text{size})$ |
-| `vector<pair<int, int>> tree(int size)` | Returns a uniformly random labeled tree on zero-based vertices. | $O(N\log N)$ |
-| `vector<pair<int, int>> graph(int n, int m, RandomGraphOptions options = {})` | Returns a random graph; the default is simple, undirected, and loopless. | Expected $O(N+M\log N)$ |
-| `vector<pair<int, int>> directed_graph(int n, int m, bool allow_self_loops = false)` | Convenience wrapper for a simple directed graph. | Expected $O(N+M)$ |
-| `vector<pair<int, int>> directed_graph(int n, int m, RandomGraphOptions options)` | Directed graph with configurable loops and parallel edges. | Expected $O(N+M)$ |
-| `vector<pair<int, int>> dag(int n, int m, RandomGraphOptions options = {})` | Returns a directed acyclic graph with configurable parallel edges. | Expected $O(N+M\log N)$ |
-| `vector<tuple<int, int, W>> weighted_tree(int n, W lower, W upper)` | Returns a random tree with independent weights in `[lower, upper]`. | $O(N\log N)$ |
-| `vector<tuple<int, int, W>> weighted_graph(int n, int m, W lower, W upper, RandomGraphOptions options = {})` | Adds independent weights to `graph`. | Expected $O(N+M\log N)$ |
-| `vector<tuple<int, int, W>> weighted_directed_graph(int n, int m, W lower, W upper, bool allow_self_loops = false)` | Adds independent weights to `directed_graph`. | Expected $O(N+M)$ |
-| `vector<tuple<int, int, W>> weighted_directed_graph(int n, int m, W lower, W upper, RandomGraphOptions options)` | Weighted directed graph with configurable loops and parallel edges. | Expected $O(N+M)$ |
-| `vector<tuple<int, int, W>> weighted_dag(int n, int m, W lower, W upper, RandomGraphOptions options = {})` | Returns a weighted DAG with configurable parallel edges. | Expected $O(N+M\log N)$ |
-| `void shuffle(vector<T>& v)` | Shuffles a vector. | $O(N)$ |
+| `std::vector<int> permutation(int size, int first = 0)` | Returns a shuffled permutation of `[first, first + size)`. | $O(\text{size})$ |
+| `std::vector<std::pair<int, int>> tree(int size)` | Returns a uniformly random labeled tree on zero-based vertices. | $O(N\log N)$ |
+| `std::vector<std::pair<int, int>> graph(int n, int m, RandomGraphOptions options = {})` | Returns a random graph; the default is simple, undirected, and loopless. | Expected $O(N+M\log N)$ |
+| `std::vector<std::pair<int, int>> directed_graph(int n, int m, bool allow_self_loops = false)` | Convenience wrapper for a simple directed graph. | Expected $O(N+M)$ |
+| `std::vector<std::pair<int, int>> directed_graph(int n, int m, RandomGraphOptions options)` | Directed graph with configurable loops and parallel edges. | Expected $O(N+M)$ |
+| `std::vector<std::pair<int, int>> dag(int n, int m, RandomGraphOptions options = {})` | Returns a directed acyclic graph with configurable parallel edges. | Expected $O(N+M\log N)$ |
+| `std::vector<std::tuple<int, int, W>> weighted_tree(int n, W lower, W upper)` | Returns a random tree with independent weights in `[lower, upper]`. | $O(N\log N)$ |
+| `std::vector<std::tuple<int, int, W>> weighted_graph(int n, int m, W lower, W upper, RandomGraphOptions options = {})` | Adds independent weights to `graph`. | Expected $O(N+M\log N)$ |
+| `std::vector<std::tuple<int, int, W>> weighted_directed_graph(int n, int m, W lower, W upper, bool allow_self_loops = false)` | Adds independent weights to `directed_graph`. | Expected $O(N+M)$ |
+| `std::vector<std::tuple<int, int, W>> weighted_directed_graph(int n, int m, W lower, W upper, RandomGraphOptions options)` | Weighted directed graph with configurable loops and parallel edges. | Expected $O(N+M)$ |
+| `std::vector<std::tuple<int, int, W>> weighted_dag(int n, int m, W lower, W upper, RandomGraphOptions options = {})` | Returns a weighted DAG with configurable parallel edges. | Expected $O(N+M\log N)$ |
+| `void shuffle(std::vector<T>& v)` | Shuffles a vector. | $O(N)$ |
 | `void shuffle(Iterator first, Iterator last)` | Shuffles an iterator range. | $O(N)$ |
-| `const T& choice(const vector<T>& v)` | Returns a random element from a non-empty vector. | $O(1)$ |
+| `const T& choice(const std::vector<T>& v)` | Returns a random element from a non-empty vector. | $O(1)$ |
 
 ## Example
 

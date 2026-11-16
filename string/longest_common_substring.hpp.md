@@ -188,8 +188,8 @@ Elements must be sortable and equality-comparable.
 | `int second_left`, `int second_right` | Half-open interval in the second sequence. | `O(1)` |
 | `int length() const` | Returns the common substring length. | `O(1)` |
 | `bool empty() const` | Returns whether the length is zero. | `O(1)` |
-| `pair<int, int> first_interval() const` | Returns `{first_left, first_right}`. | `O(1)` |
-| `pair<int, int> second_interval() const` | Returns `{second_left, second_right}`. | `O(1)` |
+| `std::pair<int, int> first_interval() const` | Returns `{first_left, first_right}`. | `O(1)` |
+| `std::pair<int, int> second_interval() const` | Returns `{second_left, second_right}`. | `O(1)` |
 
 If there is no common nonempty substring, all endpoints are zero. When several
 maximum substrings exist, any one of them may be returned.

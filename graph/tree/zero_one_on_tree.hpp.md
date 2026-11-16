@@ -300,7 +300,7 @@ is appended to its current parent group. A group containing no ones has
 infinite ratio. A set maintains the ratios, and a disjoint-set structure finds
 the current parent group after contractions.
 
-## Public Interface
+## Interface
 
 ```cpp
 long long zero_one_on_tree(

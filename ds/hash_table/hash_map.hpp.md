@@ -331,7 +331,7 @@ Pointers and references returned by `find`, `at`, `operator[]`, `insert`, and `i
 * `Hash`: Hash function. Defaults to `std::hash<Key>`.
 * `KeyEqual`: Equality predicate. Defaults to `std::equal_to<Key>`.
 
-## Constructors
+## Construction
 
 * `HashMap()`
   Constructs an empty map. ($O(1)$)

@@ -183,7 +183,7 @@ substring query.
 | `void reserve(int query_capacity)` | Reserves storage for queries. | `O(Q)` worst case |
 | `void clear()` | Removes all queries while preserving the two sequences. | `O(Q)` |
 | `int add_query(int a, int b, int c)` | Records `LCS(first[0..a), second[b..c))` and returns its insertion-order ID. | Amortized `O(1)` |
-| `vector<int> calculate() const` | Returns all recorded answers in insertion order. | `O(NM + (AM + Q) log(M + 1))` |
+| `std::vector<int> calculate() const` | Returns all recorded answers in insertion order. | `O(NM + (AM + Q) log(M + 1))` |
 
 `calculate()` uses `O(N + M + Q)` auxiliary memory. Its worst-case time is
 `O((NM + Q) log(M + 1))`. It does not mutate the object, so it may be called more

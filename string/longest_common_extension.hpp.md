@@ -222,9 +222,9 @@ Let `N = size()`.
 | `int size() const` | Returns `N`. | `O(1)` |
 | `bool empty() const` | Returns whether `N == 0`. | `O(1)` |
 | `const Sequence& sequence() const` | Returns the stored sequence. | `O(1)` |
-| `const vector<int>& suffix_array() const` | Returns suffix starts in lexicographic order. | `O(1)` |
-| `const vector<int>& rank() const` | Returns inverse suffix-array ranks. | `O(1)` |
-| `const vector<int>& lcp_array() const` | Returns adjacent suffix LCP lengths. | `O(1)` |
+| `const std::vector<int>& suffix_array() const` | Returns suffix starts in lexicographic order. | `O(1)` |
+| `const std::vector<int>& rank() const` | Returns inverse suffix-array ranks. | `O(1)` |
+| `const std::vector<int>& lcp_array() const` | Returns adjacent suffix LCP lengths. | `O(1)` |
 | `int longest_common_extension(int i, int j) const` | Returns `LCP(sequence[i..], sequence[j..])`. | `O(1)` |
 | `int longest_common_extension(int i, int j, int limit) const` | Returns `min(longest_common_extension(i, j), limit)`. | `O(1)` |
 | `int lcp(int i, int j) const` | Alias of `longest_common_extension(i, j)`. | `O(1)` |

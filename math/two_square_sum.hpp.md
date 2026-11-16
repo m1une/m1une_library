@@ -353,7 +353,7 @@ For example, `25` has four ordered non-negative representations:
 so `two_square_sum(25)` returns the pairs `(0, 5)`, `(3, 4)`, `(4, 3)`, and
 `(5, 0)`.
 
-## API
+## Interface
 
 ```cpp
 std::vector<std::pair<uint64_t, uint64_t>> two_square_sum(uint64_t value);

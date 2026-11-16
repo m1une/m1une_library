@@ -82,12 +82,18 @@ to find every occurrence of a pattern without backing up in the text.
 
 Both functions are generic over indexable sequences with comparable elements.
 
+## Requirements
+
+`N` is the text length (the sequence length for `prefix_function`), and `M` is
+the pattern length. Elements must support equality comparison; the sequences
+must support `size()` and indexed access. Returned positions are zero-based.
+
 ## Functions
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `vector<int> prefix_function(const Sequence& sequence)` | Returns the prefix-function array. | $O(N)$ |
-| `vector<int> kmp_search(const Text& text, const Pattern& pattern)` | Returns every occurrence's starting index, including overlapping matches. | $O(N + M)$ |
+| `std::vector<int> prefix_function(const Sequence& sequence)` | Returns the prefix-function array. | $O(N)$ |
+| `std::vector<int> kmp_search(const Text& text, const Pattern& pattern)` | Returns every occurrence's starting index, including overlapping matches. | $O(N + M)$ |
 
 An empty pattern occurs at every position from `0` through `text.size()`.
 

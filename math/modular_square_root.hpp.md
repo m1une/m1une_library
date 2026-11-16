@@ -342,7 +342,7 @@ The one-argument overload works with modular integer types that provide
 `val()`, static `mod()`, and construction from an integer, including
 `m1une::math::ModInt`.
 
-## API
+## Interface
 
 ```cpp
 std::optional<uint64_t> modular_square_root(

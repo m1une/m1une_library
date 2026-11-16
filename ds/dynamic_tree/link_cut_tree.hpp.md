@@ -564,7 +564,7 @@ The values must form a commutative group. The inverse lets the structure update
 aggregates of virtual child subtrees in constant time whenever `access` changes
 the preferred path. Path and subtree queries are both amortized $O(\log N)$.
 
-## Template Parameter
+## Template Parameters
 
 `Group` must satisfy `m1une::monoid::IsCommutativeGroup`:
 
@@ -628,7 +628,7 @@ is available.
 | `T prod(u, v)` | Group product on the path from `u` to `v`. | Amortized $O(\log N)$ |
 | `T path_prod(u, v)` | Alias for `prod(u, v)`. | Amortized $O(\log N)$ |
 | `int path_size(u, v)` | Number of link-cut-tree vertices on the path from `u` to `v`. | Amortized $O(\log N)$ |
-| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-indexed. | Amortized $O(\log N)$ |
+| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-based. | Amortized $O(\log N)$ |
 | `int lca(u, v)` | Returns the LCA with respect to the current represented root, or `-1` if disconnected. | Amortized $O(\log N)$ |
 | `T component_prod(v)` | Group product of the whole connected component containing `v`. | Amortized $O(\log N)$ |
 | `int component_size(v)` | Number of link-cut-tree vertices in the component containing `v`. | Amortized $O(\log N)$ |

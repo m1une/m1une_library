@@ -539,7 +539,7 @@ from `add_edge`, so parallel copies remain distinct.
 | `int component_count() const` | Returns the current number of connected components. | `O(1)` |
 | `void reserve_edges(int count)` | Reserves storage for edge ids. | `O(M)` when reallocation occurs |
 | `bool edge_alive(int id) const` | Returns whether edge `id` is active. | `O(1)` |
-| `pair<int, int> edge_endpoints(int id) const` | Returns the endpoints of edge `id`. | `O(1)` |
+| `std::pair<int, int> edge_endpoints(int id) const` | Returns the endpoints of edge `id`. | `O(1)` |
 | `bool connected(int u, int v)` | Returns whether `u` and `v` are connected. | Amortized `O(log N)` |
 | `bool same(int u, int v)` | Alias for `connected`. | Amortized `O(log N)` |
 | `int component_size(int v)` | Returns the number of vertices in `v`'s component. | Amortized `O(log N)` |

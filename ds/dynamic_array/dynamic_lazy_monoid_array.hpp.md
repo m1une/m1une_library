@@ -660,7 +660,7 @@ In this document:
 
 * `ActedMonoid`: An acted monoid satisfying `m1une::acted_monoid::IsActedMonoid`. The optional static constant `commutative = true` lets the array omit the reversed product. The optional `static int size(const T&)` lets it use size metadata already stored in `T` instead of storing a duplicate node count.
 
-## Constructors
+## Construction
 
 * `DynamicLazyMonoidArray()`
   Constructs an empty sequence. ($O(1)$)

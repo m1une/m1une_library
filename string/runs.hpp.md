@@ -166,7 +166,7 @@ vectors of integers can be passed directly.
 | Interface | Description | Complexity |
 | --- | --- | --- |
 | `Run` | A result with fields `int period`, `int left`, and `int right`. | -- |
-| `vector<Run> enumerate_runs(const Sequence& sequence)` | Returns all runs in lexicographic `(period, left, right)` order. | $O(N \log N)$ time and $O(N \log N)$ memory |
+| `std::vector<Run> enumerate_runs(const Sequence& sequence)` | Returns all runs in lexicographic `(period, left, right)` order. | $O(N \log N)$ time and $O(N \log N)$ memory |
 
 For each returned run, `[left, right)` has minimum period `period`, its length
 is at least `2 * period`, and it cannot be extended one position to either side

@@ -173,7 +173,7 @@ Primitive roots do not exist for every modulus. They exist exactly for
 * `p^k`, where `p` is an odd prime and `k >= 1`;
 * `2 * p^k`, where `p` is an odd prime and `k >= 1`.
 
-## API
+## Interface
 
 ```cpp
 bool has_primitive_root(uint64_t mod);

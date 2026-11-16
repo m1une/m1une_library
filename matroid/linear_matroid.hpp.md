@@ -152,10 +152,10 @@ All input vectors must have the same dimension.
 | `int size() const` | Returns the number of ground elements. | $O(1)$ |
 | `int dimension() const` | Returns vector dimension $D$. | $O(1)$ |
 | `const std::vector<std::vector<Field>>& vectors() const` | Returns the vectors. | $O(1)$ |
-| `bool independent(const std::vector<int>& subset) const` | Tests independence by Gaussian elimination. | $O(|S|D^2)$ |
-| `bool operator()(const std::vector<int>& subset) const` | Independence-oracle shorthand. | $O(|S|D^2)$ |
+| `bool independent(const std::vector<int>& subset) const` | Tests independence by Gaussian elimination. | $O(\lvert S \rvertD^2)$ |
+| `bool operator()(const std::vector<int>& subset) const` | Independence-oracle shorthand. | $O(\lvert S \rvertD^2)$ |
 | `BinaryLinearMatroid(std::vector<std::uint64_t> vectors)` | Stores binary vectors. | $O(N)$ |
-| `bool BinaryLinearMatroid::independent(const std::vector<int>& subset) const` | Tests XOR-basis independence. | $O(64|S|)$ |
+| `bool BinaryLinearMatroid::independent(const std::vector<int>& subset) const` | Tests XOR-basis independence. | $O(64\lvert S \rvert)$ |
 
 `BinaryLinearMatroid` also provides `size()`, `dimension()`, `vectors()`, and
 `operator()` with the same meanings. Its `dimension()` returns `64`.

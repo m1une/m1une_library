@@ -274,7 +274,7 @@ Pointers returned by `find` remain valid until the set is modified.
 * `Hash`: Hash function. Defaults to `std::hash<T>`.
 * `KeyEqual`: Equality predicate. Defaults to `std::equal_to<T>`.
 
-## Constructors
+## Construction
 
 * `HashSet()`
   Constructs an empty set. ($O(1)$)

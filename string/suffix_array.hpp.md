@@ -176,12 +176,23 @@ $O(N \log N)$. `lcp_array` uses Kasai's algorithm and runs in $O(N)$.
 `suffix_array` supports `std::string` and other indexable sequences whose
 elements are sortable. String bytes are compared as unsigned characters.
 
+## Requirements
+
+`N` is the input length. The input must support `size()` and indexed access.
+All returned positions and LCP lengths refer to the original sequence; the
+empty suffix at position `N` is not included in the suffix array.
+
+Generic suffix-array construction also needs iterators `begin()` and `end()`,
+and element comparisons `<` and `==` must agree. `lcp_array` requires the suffix
+array of this same sequence, not just an arbitrary permutation of its indices.
+Both functions use $O(N)$ auxiliary space.
+
 ## Functions
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `vector<int> suffix_array(const Sequence& sequence)` | Returns suffix starting positions in lexicographic order. | $O(N \log N)$ |
-| `vector<int> lcp_array(const Sequence& sequence, const vector<int>& sa)` | Returns LCP lengths of adjacent suffixes. The result has length `max(N - 1, 0)`. | $O(N)$ |
+| `std::vector<int> suffix_array(const Sequence& sequence)` | Returns suffix starting positions in lexicographic order. | $O(N \log N)$ |
+| `std::vector<int> lcp_array(const Sequence& sequence, const std::vector<int>& sa)` | Returns LCP lengths of adjacent suffixes. The result has length `max(N - 1, 0)`. | $O(N)$ |
 
 For `lcp = lcp_array(s, sa)`, `lcp[i]` is the longest common prefix length of
 suffixes `s[sa[i]..]` and `s[sa[i + 1]..]`.

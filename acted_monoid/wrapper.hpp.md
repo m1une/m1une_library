@@ -85,10 +85,27 @@ callable in a constant expression.
 - `bool OperatorCommutative`: Whether the operator operation `OpComp` is
   commutative. Defaults to `false`.
 
+## Interface and Complexity
+
+```cpp
+using value_type = T;
+using operator_type = E;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr T id()` | Returns the empty value-monoid identity. | Cost of `Id()` |
+| `static constexpr T op(const T& a, const T& b)` | Combines the two aggregates in left-to-right order. | Cost of `Op(a, b)` |
+| `static constexpr E op_id()` | Returns the identity update. | Cost of `OpId()` |
+| `static constexpr E op_comp(const E& f, const E& g)` | Composes updates: apply `g` first, then `f`. | Cost of `OpComp(f, g)` |
+| `static constexpr T mapping(const E& f, const T& x)` | Returns the aggregate after applying `f`; does not modify `x`. | Cost of `Mapping(f, x)` |
+
 ## Example
 
 ```cpp
 #include "acted_monoid/wrapper.hpp"
+#include <algorithm>
+#include <limits>
 
 // Definition of Range Add Range Min using Wrapper
 constexpr long long INF = std::numeric_limits<long long>::max();
@@ -104,12 +121,3 @@ using RangeAddRangeMin = m1une::acted_monoid::Wrapper<
     true
 >;
 ```
-
-## Interface and Complexity
-
-`Wrapper` exposes `value_type`, `operator_type`, `commutative`,
-`operator_commutative`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`, and
-`mapping(f, x)` for lazy data structures.
-
-Each static operation forwards to the function or lambda supplied as the
-corresponding template parameter, so its complexity is the cost of that callable.

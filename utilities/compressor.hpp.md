@@ -85,7 +85,7 @@ Coordinate compression helper. It stores sorted unique values and maps original 
 | Method | Description | Complexity |
 | --- | --- | --- |
 | `Compressor()` | Creates an empty compressor. | $O(1)$ |
-| `Compressor(vector<T> values)` | Builds from a vector. | $O(N \log N)$ |
+| `Compressor(std::vector<T> values)` | Builds from a vector. | $O(N \log N)$ |
 | `Compressor(first, last)` | Builds from an iterator range. | $O(N \log N)$ |
 | `void add(const T& value)` | Adds a value before rebuilding. | Amortized $O(1)$ |
 | `void build()` | Sorts and removes duplicates. | $O(N \log N)$ |
@@ -94,7 +94,7 @@ Coordinate compression helper. It stores sorted unique values and maps original 
 | `int upper_bound(const T& value) const` | Returns the first compressed index with value `> value`. | $O(\log N)$ |
 | `bool contains(const T& value) const` | Returns whether the value exists. | $O(\log N)$ |
 | `const T& operator[](int index) const` | Restores an original value from a compressed index. | $O(1)$ |
-| `const vector<T>& values() const` | Returns all sorted unique values. | $O(1)$ |
+| `const std::vector<T>& values() const` | Returns all sorted unique values. | $O(1)$ |
 
 ## Example
 

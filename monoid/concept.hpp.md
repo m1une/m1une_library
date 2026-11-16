@@ -489,6 +489,22 @@ deliberately optional and is not part of `IsMonoid`, so a contest-local monoid
 may omit it. An omitted flag is treated conservatively by data structures that
 inspect it.
 
+## Algebraic Laws and Cost
+
+For all valid values `a`, `b`, and `c`:
+
+* `op(op(a, b), c) == op(a, op(b, c))` (associativity).
+* `op(id(), a) == a` and `op(a, id()) == a` (identity).
+
+A range product preserves element order; it does not require
+`op(a, b) == op(b, a)`. For function-valued monoids, check the specific
+composition order on that monoid's page.
+
+Data-structure bounds usually count each monoid operation and value copy as
+constant time. Multiply by their actual costs for matrices, strings, or
+variable-length aggregates. The [library guide](https://m1une.github.io/m1une_library/guide.html)
+explains the shared notation.
+
 ## Group
 
 `m1une::monoid::IsGroup` extends `IsMonoid` with an inverse:

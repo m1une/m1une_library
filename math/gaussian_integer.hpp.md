@@ -305,7 +305,7 @@ GCD. All calculations are integral; division never uses floating point.
 #include "math/gaussian_integer.hpp"
 ```
 
-## Template Requirements
+## Requirements
 
 `T` must be a standard signed integral type no wider than `long long`. The
 default is `long long`. Coordinates returned by arithmetic and extended GCD

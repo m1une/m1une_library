@@ -86,13 +86,34 @@ title: Range AP Update Range Sum
 
 An Acted Monoid that supports overwriting a range with an arithmetic progression, alongside range sum queries.
 
-The operator replaces existing elements with $f(i) = a \cdot i + b$, where $i$ is the 0-based order inside the updated range.
+The operator replaces existing elements with $f(i) = a \cdot i + b$, where $i$ is the zero-based order inside the updated range.
 
 ### Important Usage Note
 
 Similar to `RangeApAddRangeSum`, the node state (`value_type`) tracks `size` and the sum of relative orders (`ord_sum`), enabling $O(1)$ block updates.
 
 To apply a global formula on `[l, r)`, convert it to range-local form first: `a * global_i + b` becomes `a * local_i + (a * l + b)`. The `operator_type` relies on `std::optional` to safely designate the "no operation" state.
+
+## Interface and Complexity
+
+```cpp
+using value_type = RangeApUpdateRangeSumNode<T>;
+using operator_type = std::optional<std::pair<T, T>>;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the empty value-monoid identity. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(1)$ |
+| `static constexpr operator_type op_id()` | Returns the identity update. | $O(1)$ |
+| `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)` | Composes updates: apply `g` first, then `f`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Returns the aggregate after applying `f`; does not modify `x`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x, long long ord)` | Applies `f` starting at offset `ord` within the updated range. | $O(1)$ |
+| `static constexpr operator_type op_shift(const operator_type& f, long long ord)` | Shifts the update origin forward by `ord` positions. | $O(1)$ |
+| `static constexpr operator_type op_reverse(const operator_type& f, long long size)` | Rewrites the update for a reversed segment of length `size`. | $O(1)$ |
+| `static constexpr value_type make(const T& val)` | Creates a one-element aggregate. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
 
 ## Example
 
@@ -118,13 +139,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless acted-monoid tag. Lazy data structures use its public
-`value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
-and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
-reversal-aware mappings are described above when the header provides them.
-
-The static operations are $O(1)$ for the scalar metadata stored by these range
-acted monoids, aside from the cost of the underlying arithmetic type.

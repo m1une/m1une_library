@@ -243,7 +243,7 @@ identity to update the current answer.
 must be prime, odd for the offline structure, and larger than every queried
 `n`.
 
-## API
+## Interface
 
 ```cpp
 template <class Mint>

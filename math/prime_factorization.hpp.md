@@ -345,7 +345,7 @@ pseudo-random sequence and gcd computations. Once it finds a divisor, the
 implementation recursively factors both pieces and uses Miller-Rabin to know
 when a piece is already prime.
 
-## API
+## Interface
 
 ```cpp
 bool is_prime(uint64_t value);

@@ -102,8 +102,8 @@ Oracle inputs must contain distinct valid edge indices.
 | `int size() const` | Returns the number of ground elements (edges). | $O(1)$ |
 | `int vertex_count() const` | Returns the graph's vertex count. | $O(1)$ |
 | `const std::vector<std::pair<int, int>>& edges() const` | Returns the indexed edge list. | $O(1)$ |
-| `bool independent(const std::vector<int>& subset) const` | Checks whether the selected edges are acyclic. | $O(V+|S|\alpha(V))$ |
-| `bool operator()(const std::vector<int>& subset) const` | Independence-oracle shorthand. | $O(V+|S|\alpha(V))$ |
+| `bool independent(const std::vector<int>& subset) const` | Checks whether the selected edges are acyclic. | $O(V+\lvert S \rvert\alpha(V))$ |
+| `bool operator()(const std::vector<int>& subset) const` | Independence-oracle shorthand. | $O(V+\lvert S \rvert\alpha(V))$ |
 
 ## Example
 

@@ -229,7 +229,7 @@ small even dimensions, including the Library Checker limit $N=38$.
 `T` must be a commutative ring type supporting construction from `0` and `1`,
 equality, addition, subtraction, and multiplication. Division is not required.
 
-## API
+## Interface
 
 ```cpp
 template <class T>

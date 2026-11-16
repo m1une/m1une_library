@@ -83,7 +83,7 @@ nodes takes the smaller minimum and the GCD of both `diff_gcd` values and
 the difference between their minima. This representation is associative and
 commutative, and supports negative values and negative additions.
 
-## Types and requirements
+## Types and Requirements
 
 * `T` must be a signed integral type supported by `std::gcd`, such as `int`
   or `long long`.
@@ -98,7 +98,7 @@ commutative, and supports negative values and negative additions.
 * `operator_type` is `T`, representing addition by that amount.
 * `commutative` and `operator_commutative` are both `true`.
 
-## Interface and complexity
+## Interface and Complexity
 
 All methods below are `static constexpr`, return new values, and do not mutate
 their arguments. Let $V$ bound the absolute values and differences supplied to

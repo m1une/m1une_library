@@ -1321,7 +1321,7 @@ $$
 `derangement_numbers<Mint>(maximum)` uses this recurrence and runs in
 $O(\text{maximum})$ time.
 
-## API
+## Interface
 
 ```cpp
 template <class Mint>

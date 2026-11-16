@@ -57,13 +57,33 @@ A monoid representing the Maximum operation. It is an idempotent monoid, meaning
 * **Operation**: `std::max(a, b)`
 * **Identity Element**: `Id`
 
+## Requirements
+
+`T` must support ordered comparison. A custom `Id` must be at most as small as
+every valid value. Floating-point values must have a consistent ordering;
+exclude NaNs.
+
 ## Interface and Complexity
 
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `id()`, and `op(a, b)` members. If the type also provides helpers
-such as `make(...)` or `inv(x)`, they are described above or in the documented
-properties.
+```cpp
+using value_type = T;
+```
 
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr T id()` | Returns `Id` (the lowest representable `T` by default). | $O(1)$ |
+| `static constexpr T op(const T& a, const T& b)` | Returns the larger value. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
+## Example
+
+```cpp
+#include "monoid/max.hpp"
+#include <cassert>
+
+int main() {
+    using M = m1une::monoid::Max<int>;
+    assert(M::op(3, 4) == 4);
+}
+```

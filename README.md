@@ -22,6 +22,13 @@ tools, including FPS and matrices, live under `math/`. Reusable algebraic
 definitions live in `monoid/`, `acted_monoid/`, and `beats_acted_monoid/` so
 they can be combined without rewriting boilerplate during a contest.
 
+## Documentation
+
+Start with the [library guide and conventions](https://m1une.github.io/m1une_library/guide.html)
+for indexing, complexity notation, algebraic operations, and version semantics.
+The [published reference](https://m1une.github.io/m1une_library/) lists every
+header with its interface, examples, and verification results.
+
 ## Structure
 
 | Directory | Contents |

@@ -238,7 +238,7 @@ $x_0 \lor \lnot x_1$.
 | `void add_equal(i, j)` | Forces `x_i == x_j`. | Amortized $O(1)$ |
 | `void add_not_equal(i, j)` | Forces `x_i != x_j`. | Amortized $O(1)$ |
 | `bool satisfiable()` | Solves the current formula and returns whether an assignment exists. | $O(N + M)$ |
-| `const vector<bool>& answer()` | Returns one satisfying assignment. Call only after a successful `satisfiable()`. | $O(1)$ |
+| `const std::vector<bool>& answer()` | Returns one satisfying assignment. Call only after a successful `satisfiable()`. | $O(1)$ |
 | `bool value(int i)` | Returns the assigned value of variable `i`. | $O(1)$ |
 
 Here $M$ is the number of implication edges, which is twice the number of

@@ -319,7 +319,7 @@ type, such as `MergeSortTree<int, long long>`, because arithmetic uses `Sum`
 and does not check for overflow. Ordered nonnumeric types can still use every
 nonsum method.
 
-## Public Interface
+## Interface
 
 All index ranges are zero-based and half-open.
 

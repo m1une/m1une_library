@@ -82,29 +82,55 @@ title: Range Update Range Max Subarray
 
 ## Overview
 
-An Acted Monoid for answering Maximum Contiguous Subarray Sum queries subject to Range Assignment (Set/Update) operations.
+An acted monoid for range assignment and maximum contiguous subarray sums.
 
-It maintains the total sum, prefix max, suffix max, and maximum subarray sum for each segment tree node. This represents a classic competitive programming pattern (e.g., CSES "Hotel Queries" variations or AtCoder Library practice).
+Each aggregate stores the whole-segment sum, best prefix and suffix sums, and
+best subarray sum. Combining adjacent segments also considers a subarray that
+crosses their boundary.
 
 ### Usage Notes
 
 * `operator_type` uses `std::optional<T>`, where `std::nullopt` represents no operation.
-* By default, it allows picking an empty subarray (the minimum possible answer is `0`).
+* It always allows an empty subarray, so the answer is at least zero.
+
+## Requirements and Behavior
+
+The node stores `sum`, `pref`, `suff`, `max_sub`, and `size`. Empty
+subarrays are allowed, so `max_sub` is at least zero even when every element is
+negative. A present optional update assigns a constant; `std::nullopt` is a no-op.
+
+## Interface and Complexity
+
+```cpp
+using value_type = RangeUpdateRangeMaxSubarrayNode<T>;
+using operator_type = std::optional<T>;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the empty value-monoid identity. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(1)$ |
+| `static constexpr operator_type op_id()` | Returns the identity update. | $O(1)$ |
+| `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)` | Composes updates: apply `g` first, then `f`. | $O(1)$ |
+| `static constexpr value_type mapping(const operator_type& f, const value_type& x)` | Returns the aggregate after applying `f`; does not modify `x`. | $O(1)$ |
+| `static constexpr value_type make(const T& val)` | Creates a one-element aggregate. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
 
 ## Example
 
 ```cpp
-using AM = m1une::acted_monoid::RangeUpdateRangeMaxSubarray<long long>;
-// seg.prod(l, r).max_sub will give the maximum subarray sum in range [l, r)
-// seg.apply(l, r, 5) will set all elements in [l, r) to 5.
+#include "acted_monoid/range_update_range_max_subarray.hpp"
+#include "ds/segtree/lazy_segtree.hpp"
+#include <cassert>
+#include <vector>
+
+int main() {
+    using AM = m1une::acted_monoid::RangeUpdateRangeMaxSubarray<long long>;
+    m1une::ds::LazySegtree<AM> seg(std::vector<long long>{-2, 3, -1, 4});
+    assert(seg.prod(0, 4).max_sub == 6);
+    seg.apply(1, 3, -5);  // Values become -2, -5, -5, 4.
+    assert(seg.prod(0, 4).max_sub == 4);
+    assert(seg.prod(0, 3).max_sub == 0);  // Choose the empty subarray.
+}
 ```
-
-## Interface and Complexity
-
-This is a stateless acted-monoid tag. Lazy data structures use its public
-`value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
-and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
-reversal-aware mappings are described above when the header provides them.
-
-The static operations are $O(1)$ for the scalar metadata stored by these range
-acted monoids, aside from the cost of the underlying arithmetic type.

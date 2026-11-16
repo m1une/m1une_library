@@ -254,7 +254,7 @@ move and choose a starting temperature that accepts a useful fraction of those
 moves. To target probability `p`, use `T = -D / log(p)`. Then tune from observed
 acceptance rates and solution quality.
 
-## API
+## Interface
 
 | Method | Description | Complexity |
 | --- | --- | --- |

@@ -452,7 +452,7 @@ Constructors and read-only methods follow the corresponding mutable structure.
 All overloads are the mutable-return counterparts of the mutable structure:
 vector, initializer-list, rollback-array, and ordinary-array insertion are
 
-## Snapshot semantics
+## Snapshot Semantics
 
 Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 

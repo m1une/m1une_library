@@ -845,7 +845,7 @@ candidate order are accepted and deduplicated. Candidate positions and
 unregistered updates are asserted in debug builds; an unregistered update is
 an invalid operation.
 
-## Public Interface
+## Interface
 
 All positions are zero-based and all index and key ranges are half-open.
 
@@ -862,14 +862,14 @@ keys, `H = ceil(log2(V))`, and `M` the number of distinct registered
 
 | Method | Description | Complexity |
 | --- | --- | --- |
-| `OfflinePointUpdateRangeOrderStatisticsSum(const vector<T>& initial_values, const vector<pair<int, T>>& update_candidates)` | Registers candidates and uses every initial key as its weight. | $O(MH\log N)$ time, $O(MH)$ memory |
-| `OfflinePointUpdateRangeOrderStatisticsSum(const vector<T>& initial_keys, const vector<Sum>& initial_weights, const vector<pair<int, T>>& update_candidates)` | Registers candidates and builds separate initial weights. | $O(MH\log N)$ time, $O(MH)$ memory |
+| `OfflinePointUpdateRangeOrderStatisticsSum(const std::vector<T>& initial_values, const std::vector<std::pair<int, T>>& update_candidates)` | Registers candidates and uses every initial key as its weight. | $O(MH\log N)$ time, $O(MH)$ memory |
+| `OfflinePointUpdateRangeOrderStatisticsSum(const std::vector<T>& initial_keys, const std::vector<Sum>& initial_weights, const std::vector<std::pair<int, T>>& update_candidates)` | Registers candidates and builds separate initial weights. | $O(MH\log N)$ time, $O(MH)$ memory |
 | `int size() const` | Returns the fixed sequence length. | $O(1)$ |
 | `bool empty() const` | Returns whether the sequence is empty. | $O(1)$ |
 | `T access(int position) const` | Returns the active key. | $O(1)$ |
 | `T operator[](int position) const` | Equivalent to `access(position)`. | $O(1)$ |
 | `Sum weight(int position) const` | Returns the active weight. | $O(1)$ |
-| `pair<T, Sum> get(int position) const` | Returns the active key and weight. | $O(1)$ |
+| `std::pair<T, Sum> get(int position) const` | Returns the active key and weight. | $O(1)$ |
 
 Candidate sorting and key compression also cost
 `O((N + candidates) log(N + candidates))`; the displayed construction bound
@@ -899,8 +899,8 @@ does not allocate.
 | `int range_freq(int left, int right, T lower, T upper) const` | Counts keys in `[lower, upper)`. | $O(H\log N)$ |
 | `T kth_smallest(int left, int right, int k) const` | Returns the zero-based `k`-th smallest key. | $O(H\log N)$ |
 | `T kth_largest(int left, int right, int k) const` | Returns the zero-based `k`-th largest key. | $O(H\log N)$ |
-| `optional<T> prev_value(int left, int right, T upper) const` | Returns the greatest key below `upper`, or `nullopt`. | $O(H\log N)$ |
-| `optional<T> next_value(int left, int right, T lower) const` | Returns the smallest key at least `lower`, or `nullopt`. | $O(H\log N)$ |
+| `std::optional<T> prev_value(int left, int right, T upper) const` | Returns the greatest key below `upper`, or `nullopt`. | $O(H\log N)$ |
+| `std::optional<T> next_value(int left, int right, T lower) const` | Returns the smallest key at least `lower`, or `nullopt`. | $O(H\log N)$ |
 
 The `k`-th methods require `0 <= k < right - left`.
 
@@ -913,8 +913,8 @@ The `k`-th methods require `0 <= k < right - left`.
 | `Sum range_sum(int left, int right, T lower, T upper) const` | Sums weights whose keys are in `[lower, upper)`. | $O(H\log N)$ |
 | `Sum sum_k_smallest(int left, int right, int k) const` | Sums the first `k` elements in ascending key order. | $O(H\log N)$ |
 | `Sum sum_k_largest(int left, int right, int k) const` | Sums the first `k` elements in descending key order. | $O(H\log N)$ |
-| `optional<int> min_count_smallest_sum_at_least(int left, int right, const Sum& target) const` | Returns the minimum ascending-order count whose sum reaches `target`. | $O(H\log N)$ |
-| `optional<int> min_count_largest_sum_at_least(int left, int right, const Sum& target) const` | Returns the minimum descending-order count whose sum reaches `target`. | $O(H\log N)$ |
+| `std::optional<int> min_count_smallest_sum_at_least(int left, int right, const Sum& target) const` | Returns the minimum ascending-order count whose sum reaches `target`. | $O(H\log N)$ |
+| `std::optional<int> min_count_largest_sum_at_least(int left, int right, const Sum& target) const` | Returns the minimum descending-order count whose sum reaches `target`. | $O(H\log N)$ |
 
 Sum methods allow `0 <= k <= right - left`. Equal keys use increasing current
 sequence index for `smallest` and decreasing current sequence index for
@@ -941,11 +941,21 @@ handles, so replacement removes the old path and activates the new path without
 searching node coordinate arrays. Ordinary updates and queries allocate no
 memory.
 
-## ABC467 G-style example
+## Example: Offline Updates and Threshold Queries
+
+The input is `n q`, followed by `n` nonnegative initial values and `q` queries
+`position value left right target`. Each query first assigns `value` to one
+position, then asks how many of the largest values in the inclusive interval
+`[left, right]` are needed to reach the positive `target`. Input positions are
+one-based; the program converts them to zero-based, half-open ranges.
+It prints `-1` when the interval sum is too small.
+
+All future `(position, value)` assignments are registered before construction.
 
 ```cpp
 #include "ds/range_query/offline_point_update_range_order_statistics_sum.hpp"
 
+#include <iostream>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -959,22 +969,17 @@ struct Query {
 };
 
 int main() {
-    int n = read_int();
-    int q = read_int();
+    int n, q;
+    if (!(std::cin >> n >> q)) return 0;
     std::vector<int> initial_values(n);
-    read(initial_values);
+    for (int& value : initial_values) std::cin >> value;
 
     std::vector<Query> queries(q);
     std::vector<std::pair<int, int>> candidates;
     candidates.reserve(q);
     for (Query& query : queries) {
-        read(
-            query.position,
-            query.value,
-            query.left,
-            query.right,
-            query.target
-        );
+        std::cin >> query.position >> query.value
+                 >> query.left >> query.right >> query.target;
         query.position--;
         query.left--;
         candidates.emplace_back(query.position, query.value);
@@ -991,7 +996,7 @@ int main() {
                 query.right,
                 query.target
             );
-        print(answer.has_value() ? answer.value() : -1);
+        std::cout << answer.value_or(-1) << '\n';
     }
 }
 ```

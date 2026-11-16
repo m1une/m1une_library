@@ -602,7 +602,7 @@ of virtual child subtrees, while path lazy propagation updates only
 preferred-path vertices. Path operations and subtree queries are amortized
 $O(\log N)$.
 
-## Template Parameter
+## Template Parameters
 
 `ActedGroup` must satisfy
 `m1une::acted_monoid::IsCommutativeActedGroup`:
@@ -678,7 +678,7 @@ Construction from `std::vector<U>` is supported when
 | `T prod(u, v)` | Value product on the path from `u` to `v`. | Amortized $O(\log N)$ |
 | `T path_prod(u, v)` | Alias for `prod(u, v)`. | Amortized $O(\log N)$ |
 | `int path_size(u, v)` | Number of link-cut-tree vertices on the path from `u` to `v`. | Amortized $O(\log N)$ |
-| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-indexed. | Amortized $O(\log N)$ |
+| `int kth_vertex(u, v, k)` | Returns the `k`-th vertex on the path from `u` to `v`, zero-based. | Amortized $O(\log N)$ |
 | `int lca(u, v)` | Returns the LCA with respect to the current represented root, or `-1` if disconnected. | Amortized $O(\log N)$ |
 | `T component_prod(v)` | Value product of the whole connected component containing `v`. | Amortized $O(\log N)$ |
 | `int component_size(v)` | Number of link-cut-tree vertices in the component containing `v`. | Amortized $O(\log N)$ |

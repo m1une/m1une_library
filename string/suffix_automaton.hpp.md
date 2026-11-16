@@ -289,7 +289,7 @@ Let `S` be the number of states and `L` a query-sequence length.
 | `state_id root() const` | Returns state zero. | `O(1)` |
 | `state_id last() const` | Returns the state of the complete text. | `O(1)` |
 | `const State& state(id) const` | Returns state metadata. | `O(1)` |
-| `const vector<State>& states() const` | Returns all states. | `O(1)` |
+| `const std::vector<State>& states() const` | Returns all states. | `O(1)` |
 | `int minimum_length(id) const` | Returns the minimum substring length represented by the state. | `O(1)` |
 | `state_id transition(id, symbol) const` | Returns one transition, or `null_state`. | `O(1)` |
 | `void reserve(capacity)` | Reserves enough state storage for the text capacity. | `O(S)` if reallocated |
@@ -298,13 +298,13 @@ Let `S` be the number of states and `L` a query-sequence length.
 | `void build(sequence)` | Appends a sequence. | Amortized `O(N)` |
 | `state_id find(sequence) const` | Returns the reached state, or `null_state`. | `O(L)` |
 | `bool contains(sequence) const` | Tests whether the sequence is a substring. | `O(L)` |
-| `vector<state_id> length_order() const` | Returns states in nondecreasing maximum length. | `O(S + N)` |
-| `vector<long long> occurrence_counts() const` | Returns end-position-class occurrence counts. | `O(S + N)` |
-| `vector<bool> terminal_states() const` | Marks states representing suffixes of the complete text. | `O(N)` |
+| `std::vector<state_id> length_order() const` | Returns states in nondecreasing maximum length. | `O(S + N)` |
+| `std::vector<long long> occurrence_counts() const` | Returns end-position-class occurrence counts. | `O(S + N)` |
+| `std::vector<bool> terminal_states() const` | Marks states representing suffixes of the complete text. | `O(N)` |
 | `long long distinct_substring_count() const` | Counts distinct nonempty substrings. | `O(S)` |
-| `pair<int, int> longest_representative(id) const` | Returns a representative interval for the state's maximum-length string. | `O(1)` |
-| `pair<int, int> representative_occurrence(sequence) const` | Returns a representative interval, or `{-1, -1}`. | `O(L)` |
-| `pair<int, int> longest_common_substring(sequence) const` | Returns a longest matching half-open interval in the query sequence. | `O(L)` |
+| `std::pair<int, int> longest_representative(id) const` | Returns a representative interval for the state's maximum-length string. | `O(1)` |
+| `std::pair<int, int> representative_occurrence(sequence) const` | Returns a representative interval, or `{-1, -1}`. | `O(L)` |
+| `std::pair<int, int> longest_common_substring(sequence) const` | Returns a longest matching half-open interval in the query sequence. | `O(L)` |
 
 `occurrence_counts()[v]` is the occurrence count shared by every substring
 whose path ends at state `v`. The root count is the text length.

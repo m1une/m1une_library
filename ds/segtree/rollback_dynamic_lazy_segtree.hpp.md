@@ -530,7 +530,7 @@ Constructors and read-only methods follow the corresponding mutable structure.
 $U$ is the domain width, $P$ is the number of materialized nodes, and $F$ is
 the number of saved or newly allocated nodes discarded by the operation.
 
-## Snapshot semantics
+## Snapshot Semantics
 
 Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 

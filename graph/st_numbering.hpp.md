@@ -247,7 +247,7 @@ least two vertices, and `source` and `sink` must be distinct valid vertices.
 Parallel edges are supported. Inactive edges and self-loops are ignored. The
 algorithm is iterative and does not mutate the graph.
 
-## API
+## Interface
 
 ```cpp
 template <class T>

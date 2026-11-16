@@ -136,7 +136,7 @@ int main() {
 The important ownership rule is that `accept` does not change anything. The
 caller updates `current` and `current_score` only when it returns `true`.
 
-## API
+## Interface
 
 | Method | Description | Complexity |
 | --- | --- | --- |

@@ -295,7 +295,7 @@ Use `directed_eulerian_trail` with graphs built by `add_directed_edge`, and
 `undirected_eulerian_trail` with graphs built by `add_edge`. Mixing directed and
 undirected edge representations in one call is not supported.
 
-## API
+## Interface
 
 ```cpp
 struct EulerianTrail {

@@ -153,7 +153,7 @@ constant time.
 
 `SwagDeque<Monoid>` is a shorter alias.
 
-## Template Requirements
+## Requirements
 
 `Monoid` must satisfy `m1une::monoid::IsMonoid`. Its `value_type` must be
 copy-constructible, and `Monoid::op(a, b)` must be associative with identity

@@ -233,7 +233,7 @@ $N-1$. It is deterministic and does not compute individual minors.
 addition, subtraction, multiplication, and division by nonzero values. The
 input matrix must be square.
 
-## Public Interface
+## Interface
 
 ```cpp
 template <class T>

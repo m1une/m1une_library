@@ -1142,7 +1142,7 @@ $$
 `inv()`, `val()`, and static `mod()`. Both `m1une::math::ModInt` and compatible
 runtime-modulus types can be used. The modulus must fit in `uint64_t`.
 
-## API
+## Interface
 
 ```cpp
 template <class Mint>

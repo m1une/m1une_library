@@ -143,7 +143,7 @@ Every `merge` call appends exactly one history entry. A redundant merge appends
 a no-op entry and returns `false`, so one call to `undo()` always reverses one
 call to `merge()`.
 
-## API
+## Interface
 
 ```cpp
 struct RollbackDsu {

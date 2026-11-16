@@ -356,33 +356,60 @@ Ready-made acted monoids are available in `acted_monoid/`.
 ## Construction
 
 * `LazySegtree()`: creates an empty tree.
-* `LazySegtree(int n)`: creates `n` elements initialized with
+* `explicit LazySegtree(int n)`: creates `n` elements initialized with
   `ActedMonoid::id()`.
-* `LazySegtree(const std::vector<T>& v)`: builds from acted-monoid values.
-* `LazySegtree(std::vector<T>&& v)`: builds from moved acted-monoid values.
-* `LazySegtree(const std::vector<U>& v)`: builds from another value type when
+* `explicit LazySegtree(const std::vector<T>& v)`: builds from acted-monoid values.
+* `explicit LazySegtree(std::vector<T>&& v)`: builds from moved acted-monoid values.
+* `template <typename U> explicit LazySegtree(const std::vector<U>& v)`: builds from another value type when
   `ActedMonoid::make(value)`, `ActedMonoid::make(value, index)`, or
   `static_cast<T>(value)` is available.
 
-All non-empty constructors build the tree in $O(N)$ time.
+`LazySegtree()` takes $O(1)$ time. The other constructors take $O(N)$
+time and store $O(N)$ values, assuming constant-time algebra operations and copies.
+
+## Requirements and Behavior
+
+Let `N = size()`. Point indices must satisfy `0 <= p < N`, and ranges must
+satisfy `0 <= l <= r <= N`. An empty product is the identity. Products combine
+elements from left to right; commutativity is not required.
+
+The stated bounds assume constant-time algebra operations and value copies.
+`T` denotes `typename ActedMonoid::value_type`, and `F` denotes
+`typename ActedMonoid::operator_type`.
+
+If `T` includes a segment length, initialize from actual values using the
+adapting vector constructor or `ActedMonoid::make(value)`. The size-only
+constructor fills leaves with `id()`, which usually represents zero elements.
+Likewise, `set` expects a complete aggregate, such as `AM::make(value)`.
+
+`op_comp(f, g)` applies `g` first, then `f`. Queries such as `get` and `prod`
+may push lazy tags and change the internal representation while preserving the
+logical array; this is why those methods are not `const`.
+
+For `max_right` and `min_left`, the predicate must return `true` on the identity
+and must be monotone as the range grows: once it becomes `false`, it must stay
+false. It must return the same result each time for the same value. For
+example, `sum <= limit` works with nonnegative array values and `limit >= 0`;
+negative elements can violate this requirement. Searches return `N` or `0`
+when the whole available range satisfies the predicate.
 
 ## Methods
 
 | Method | Description | Complexity |
 | --- | --- | --- |
-| `int size()` | Returns the number of elements. | $O(1)$ |
-| `bool empty()` | Returns whether the tree has no elements. | $O(1)$ |
+| `int size() const` | Returns the number of elements. | $O(1)$ |
+| `bool empty() const` | Returns whether the tree has no elements. | $O(1)$ |
 | `void set(int p, T x)` | Assigns `x` to index `p`. | $O(\log N)$ |
 | `T get(int p)` | Pushes pending lazy updates on the path and returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
-| `T prod(int l, int r)` | Returns the value monoid product over `[l, r)`. | $O(\log N)$ |
-| `T all_prod()` | Returns the product of the entire array. | $O(1)$ |
+| `T prod(int l, int r) const` | Returns the value monoid product over `[l, r)`. | $O(\log N)$ |
+| `T all_prod() const` | Returns the product of the entire array. | $O(1)$ |
 | `std::vector<T> to_vector()` | Pushes all pending updates and returns all elements. | $O(N)$ |
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O((r - l) \log N)$ |
 | `void apply(int p, F f)` | Applies operator `f` to index `p`. | $O(\log N)$ |
 | `void apply(int l, int r, F f)` | Applies operator `f` to every element in `[l, r)`. | $O(\log N)$ |
-| `int max_right<G>(int l, G g)` | Returns the largest `r` such that `g(prod(l, r))` is `true`. Requires `g(ActedMonoid::id())`. | $O(\log N)$ |
-| `int min_left<G>(int r, G g)` | Returns the smallest `l` such that `g(prod(l, r))` is `true`. Requires `g(ActedMonoid::id())`. | $O(\log N)$ |
+| `template <class G> int max_right(int l, G g)` | Returns the largest `r` such that `g(prod(l, r))` is `true`. Requires `g(ActedMonoid::id())`. | $O(\log N)$ |
+| `template <class G> int min_left(int r, G g)` | Returns the smallest `l` such that `g(prod(l, r))` is `true`. Requires `g(ActedMonoid::id())`. | $O(\log N)$ |
 
 ## Example
 

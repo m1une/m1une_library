@@ -1378,7 +1378,7 @@ The implementation automatically chooses between:
 * three NTT convolutions plus CRT reconstruction for moduli such as
   `1000000007`.
 
-## API
+## Interface
 
 ```cpp
 template <class Mint>

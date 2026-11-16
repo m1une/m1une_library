@@ -128,7 +128,10 @@ title: Rolling Hash Monoid
 
 A monoid for maintaining a dynamic rolling hash of a string on a Segment Tree. This allows you to update characters in $O(\log N)$ and query the hash of any substring in $O(\log N)$.
 
-By default, it uses $Base = 10007$ and $Mod = 2^{61}-1$ (a Mersenne prime), which provides extreme collision resistance and avoids the need to specify them manually.
+The defaults are $Base = 10007$ and $Mod = 2^{61}-1$.
+Different strings can have equal hashes. Hash equality is a probabilistic
+comparison, and the fixed default base gives no protection against inputs
+chosen to cause collisions. Compare lengths as well as hash values.
 
 ## Data Structure
 
@@ -149,7 +152,21 @@ Generates a valid monoid element for a single character.
 * **Parameters:** `c` is the character code (or integer) for one element.
 * **Returns:** A `value_type` pair initialized as `{c % Mod, Base % Mod}`.
 
-### Example
+## Interface and Complexity
+
+```cpp
+using value_type = std::pair<long long, long long>;
+```
+
+| Method | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr value_type id()` | Returns the identity aggregate representing no elements. | $O(1)$ |
+| `static constexpr value_type op(const value_type& a, const value_type& b)` | Combines the two aggregates in left-to-right order. | $O(1)$ |
+| `static constexpr value_type make(long long c)` | Creates a one-element aggregate. | $O(1)$ |
+
+Bounds count operations on the stored scalar type as $O(1)$; account for its cost when using a larger numeric type.
+
+## Example
 
 ```cpp
 #include "ds/segtree/segtree.hpp"
@@ -165,7 +182,7 @@ int main() {
     std::string S = "abracadabra";
     int N = S.length();
 
-    // 1. Initialize leaf nodes securely using `make`
+    // 1. Convert characters into leaf aggregates using `make`
     std::vector<RHMonoid::value_type> init_data(N);
     for (int i = 0; i < N; ++i) {
         // Pass the character S[i] to `make`
@@ -186,14 +203,3 @@ int main() {
     return 0;
 }
 ```
-
-## Interface and Complexity
-
-This is a stateless algebra tag. Generic data structures use its public
-`value_type`, `id()`, and `op(a, b)` members. If the type also provides helpers
-such as `make(...)` or `inv(x)`, they are described above or in the documented
-properties.
-
-Each static operation runs in the cost of the underlying operation shown in the
-properties. Scalar monoids are $O(1)$; monoids whose `value_type` stores several
-items, permutations, or matrices scale with that stored size.

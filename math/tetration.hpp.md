@@ -292,8 +292,8 @@ asserted against in debug builds.
 | --- | --- | --- |
 | `uint64_t tetration_mod(base, height, mod)` | Returns `base^^height mod mod`. | Totient-chain factorization and logarithmic modular powers |
 | `uint64_t tetration_bounded(base, height, limit)` | Returns `min(base^^height, limit)`. | `O(log limit)` effective recursion for `base >= 2` |
-| `uint64_t power_tower_mod(vector<T> bases, mod)` | Returns `bases[0]^(bases[1]^(...)) mod mod`. Empty tower is `1`. | Totient-chain factorization and logarithmic modular powers |
-| `uint64_t power_tower_bounded(vector<T> bases, limit)` | Returns `min(tower, limit)`. Empty tower is `1`. | Bounded by the tower length and `log limit` |
+| `uint64_t power_tower_mod(std::vector<T> bases, mod)` | Returns `bases[0]^(bases[1]^(...)) mod mod`. Empty tower is `1`. | Totient-chain factorization and logarithmic modular powers |
+| `uint64_t power_tower_bounded(std::vector<T> bases, limit)` | Returns `min(tower, limit)`. Empty tower is `1`. | Bounded by the tower length and `log limit` |
 
 `mod` must be positive. If `mod == 1`, modular functions return `0`.
 

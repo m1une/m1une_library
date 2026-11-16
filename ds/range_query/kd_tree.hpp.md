@@ -342,7 +342,7 @@ For integral `T`, squared distances use signed 128-bit arithmetic. For
 floating-point `T`, they use `long double`. Every squared distance and
 intermediate sum must fit in `distance_type`.
 
-## Public Interface
+## Interface
 
 ```cpp
 template <class T, std::size_t K>

@@ -86,7 +86,7 @@ also requires them to be copyable.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `vector<pair<T, T>> merge_intervals(vector<pair<T, T>> intervals)` | Returns the union of the half-open intervals `[left, right)`. The argument is copied when an lvalue is passed and can be consumed with `std::move`. | $O(N \log N)$ time and $O(1)$ auxiliary space |
+| `std::vector<std::pair<T, T>> merge_intervals(std::vector<std::pair<T, T>> intervals)` | Returns the union of the half-open intervals `[left, right)`. The argument is copied when an lvalue is passed and can be consumed with `std::move`. | $O(N \log N)$ time and $O(1)$ auxiliary space |
 
 ## Notes
 

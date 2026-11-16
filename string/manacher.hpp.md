@@ -108,6 +108,15 @@ $O(1)$.
 
 The function is generic over indexable sequences with comparable elements.
 
+## Function
+
+| Function | Description | Complexity |
+| --- | --- | --- |
+| `template <class Sequence> ManacherResult manacher(const Sequence& sequence)` | Builds odd and even palindrome radii. Elements need equality comparison, `int size() const`, and indexed access. | $O(N)$ time and space, where `N = sequence.size()`. |
+
+An empty input is supported. `is_palindrome(l, r)` accepts
+`0 <= l <= r <= N`; the empty substring is a palindrome.
+
 ## Result
 
 `ManacherResult` contains:
@@ -116,10 +125,10 @@ The function is generic over indexable sequences with comparable elements.
 | --- | --- | --- |
 | `odd[i]` | Radius including center `i`; palindrome `[i - odd[i] + 1, i + odd[i])`. | Access $O(1)$ |
 | `even[i]` | Radius centered between `i - 1` and `i`; palindrome `[i - even[i], i + even[i])`. | Access $O(1)$ |
-| `size()` | Returns the original sequence length. | $O(1)$ |
-| `empty()` | Returns whether the sequence is empty. | $O(1)$ |
-| `is_palindrome(l, r)` | Returns whether `[l, r)` is a palindrome. | $O(1)$ |
-| `longest_length()` | Returns the longest palindromic substring length. | $O(N)$ |
+| `int size() const` | Returns the original sequence length. | $O(1)$ |
+| `bool empty() const` | Returns whether the sequence is empty. | $O(1)$ |
+| `bool is_palindrome(int left, int right) const` | Returns whether `[l, r)` is a palindrome. | $O(1)$ |
+| `int longest_length() const` | Returns the longest palindromic substring length. | $O(N)$ |
 
 Construction takes $O(N)$ time and space.
 

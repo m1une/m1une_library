@@ -111,9 +111,9 @@ algorithms. Every subset sum of the original array can be written as
   support `operator+` and `operator<`, and addition by a fixed value must
   preserve ordering. Every subset sum must be representable by `T`.
 
-## Methods
+## Functions
 
-| Method | Description | Complexity |
+| Function | Description | Complexity |
 | --- | --- | --- |
 | `std::pair<std::vector<T>, std::vector<T>> enumerate_half_subset_sums(const std::vector<T>& values)` | Returns the sorted subset sums of `values[0, N / 2)` and `values[N / 2, N)`. | $O(2^{N/2})$ time and space |
 | `T maximum_subset_sum(const std::vector<T>& values, const T& limit)` | Returns the maximum subset sum not exceeding `limit`. Requires `T{} <= limit`. | $O(2^{N/2})$ time and space |

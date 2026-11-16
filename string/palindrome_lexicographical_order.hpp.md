@@ -384,13 +384,13 @@ palindrome.
 | `int text_length() const` | Returns `N`. | $O(1)$ |
 | `const Sequence& sequence() const` | Returns the indexed sequence. | $O(1)$ |
 | `const eertree_type& eertree() const` | Returns the underlying eertree. | $O(1)$ |
-| `const vector<node_id>& nodes_in_order() const` | Returns all real eertree nodes in increasing lexicographic order. | $O(1)$ |
+| `const std::vector<node_id>& nodes_in_order() const` | Returns all real eertree nodes in increasing lexicographic order. | $O(1)$ |
 | `int order_of_node(id) const` | Returns the zero-based rank of a real eertree node. | $O(1)$ |
 | `node_id node_by_order(order) const` | Returns the eertree node having the given rank. | $O(1)$ |
 | `node_id find(palindrome) const` | Returns its node, or `eertree_type::null_node` if it is not a nonempty palindromic substring. | $O(L)$ |
 | `bool contains(palindrome) const` | Tests whether it is indexed. | $O(L)$ |
 | `int order_of_palindrome(palindrome) const` | Returns its rank, or `-1` if it is not indexed. | $O(L)$ |
-| `pair<int, int> representative_occurrence(order) const` | Returns a half-open occurrence interval of the ranked palindrome. | $O(1)$ |
+| `std::pair<int, int> representative_occurrence(order) const` | Returns a half-open occurrence interval of the ranked palindrome. | $O(1)$ |
 | `Sequence palindrome(order) const` | Returns a copy of the ranked palindrome. | $O(L)$ |
 | `Sequence kth(order) const` | Alias of `palindrome(order)`. | $O(L)$ |
 

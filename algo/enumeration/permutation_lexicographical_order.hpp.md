@@ -167,7 +167,7 @@ permutations.
 #include "algo/enumeration/permutation_lexicographical_order.hpp"
 ```
 
-## Template Requirements
+## Requirements
 
 `UInt` must be an unsigned integral type other than `bool`. The default is
 `std::uint64_t`.
@@ -181,10 +181,10 @@ Let `N` be the permutation size.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `optional<UInt> checked_permutation_lexicographical_rank<UInt>(permutation)` | Returns its zero-based rank, or `nullopt` if the input is not a permutation of `[0, N)` or the rank does not fit in `UInt`. | $O(N \log N)$ time and $O(N)$ memory |
+| `std::optional<UInt> checked_permutation_lexicographical_rank<UInt>(permutation)` | Returns its zero-based rank, or `nullopt` if the input is not a permutation of `[0, N)` or the rank does not fit in `UInt`. | $O(N \log N)$ time and $O(N)$ memory |
 | `UInt permutation_lexicographical_rank<UInt>(permutation)` | Returns its zero-based rank. The input and result must be valid. | $O(N \log N)$ time and $O(N)$ memory |
-| `optional<vector<int>> checked_kth_lexicographical_permutation(size, rank)` | Returns the permutation at `rank`, or `nullopt` if `size` is negative or `rank` is at least $N!$. | $O(N \log N)$ time and $O(N)$ memory |
-| `vector<int> kth_lexicographical_permutation(size, rank)` | Returns the permutation at `rank`. The rank must be less than $N!$. | $O(N \log N)$ time and $O(N)$ memory |
+| `std::optional<std::vector<int>> checked_kth_lexicographical_permutation(size, rank)` | Returns the permutation at `rank`, or `nullopt` if `size` is negative or `rank` is at least $N!$. | $O(N \log N)$ time and $O(N)$ memory |
+| `std::vector<int> kth_lexicographical_permutation(size, rank)` | Returns the permutation at `rank`. The rank must be less than $N!$. | $O(N \log N)$ time and $O(N)$ memory |
 
 The unchecked functions assert their preconditions. The checked functions do
 not rely on computing $N!$, so they remain usable when $N!$ does not fit in

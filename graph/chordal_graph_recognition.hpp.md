@@ -311,7 +311,7 @@ edge, so they do not change the result.
 
 Edge costs are ignored. The graph is not mutated.
 
-## API
+## Interface
 
 ```cpp
 struct ChordalGraphResult {

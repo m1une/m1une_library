@@ -505,8 +505,8 @@ nodes.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
-| `UInt kth_xor(int k, UInt x) const` | Returns the 0-indexed `k`-th smallest result among `key ^ x`, including duplicate keys. | $O(B)$ |
-| `UInt kth(int k) const` | Returns the 0-indexed `k`-th smallest key. | $O(B)$ |
+| `UInt kth_xor(int k, UInt x) const` | Returns the zero-based `k`-th smallest result among `key ^ x`, including duplicate keys. | $O(B)$ |
+| `UInt kth(int k) const` | Returns the zero-based `k`-th smallest key. | $O(B)$ |
 | `UInt min() const`, `UInt max() const` | Returns the smallest or largest key. Requires a nonempty trie. | $O(B)$ |
 | `UInt min_xor(UInt x) const`, `UInt max_xor(UInt x) const` | Returns the minimum or maximum result among `key ^ x`. Requires a nonempty trie. | $O(B)$ |
 
