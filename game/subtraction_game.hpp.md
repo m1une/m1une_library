@@ -66,8 +66,8 @@ data:
   timestamp: '2026-08-24 02:07:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/game/game_algorithms.test.cpp
   - verify/game/classic_games.test.cpp
+  - verify/game/game_algorithms.test.cpp
 documentation_of: game/subtraction_game.hpp
 layout: document
 title: Subtraction Game

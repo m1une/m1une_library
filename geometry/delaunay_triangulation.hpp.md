@@ -550,10 +550,10 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/point_data.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
 documentation_of: geometry/delaunay_triangulation.hpp
 layout: document
 title: Delaunay Triangulation

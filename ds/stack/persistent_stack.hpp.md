@@ -141,8 +141,8 @@ data:
   timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_release.test.cpp
   - verify/ds/stack/persistent_stack.test.cpp
+  - verify/ds/persistent_release.test.cpp
 documentation_of: ds/stack/persistent_stack.hpp
 layout: document
 title: Persistent Stack

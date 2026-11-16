@@ -189,8 +189,8 @@ data:
   timestamp: '2026-07-15 01:33:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/bst/mex_multiset.test.cpp
   - verify/ds/bst/predecessor_set.test.cpp
+  - verify/ds/bst/mex_multiset.test.cpp
 documentation_of: ds/bst/predecessor_set.hpp
 layout: document
 title: Predecessor Set

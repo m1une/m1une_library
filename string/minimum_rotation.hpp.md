@@ -55,8 +55,8 @@ data:
   isVerificationFile: false
   path: string/minimum_rotation.hpp
   requiredBy:
-  - string/lyndon_factorization.hpp
   - string/all.hpp
+  - string/lyndon_factorization.hpp
   timestamp: '2026-07-13 05:39:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

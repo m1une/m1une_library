@@ -134,17 +134,17 @@ data:
   - algo/all.hpp
   - algo/offline/all.hpp
   - graph/all.hpp
-  - graph/tree/mo_on_tree.hpp
   - graph/tree/all.hpp
+  - graph/tree/mo_on_tree.hpp
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/offline/mo.test.cpp
   - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/cow_game.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/mo_on_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: algo/offline/mo.hpp
 layout: document
 title: Mo's Algorithm

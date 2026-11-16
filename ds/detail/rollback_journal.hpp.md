@@ -125,19 +125,19 @@ data:
   isVerificationFile: false
   path: ds/detail/rollback_journal.hpp
   requiredBy:
-  - ds/segtree/rollback_dynamic_lazy_segtree.hpp
-  - ds/segtree/rollback_dual_segtree.hpp
-  - ds/segtree/rollback_dynamic_segtree.hpp
   - ds/segtree/rollback_dynamic_dual_segtree.hpp
   - ds/segtree/rollback_segtree_beats.hpp
   - ds/segtree/rollback_lazy_segtree.hpp
+  - ds/segtree/rollback_dynamic_segtree.hpp
+  - ds/segtree/rollback_dual_segtree.hpp
+  - ds/segtree/rollback_dynamic_lazy_segtree.hpp
   - ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
   timestamp: '2026-08-12 17:21:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/segtree/rollback_lazy_segtree.test.cpp
-  - verify/ds/rollback_counterparts.test.cpp
-  - verify/ds/rollback_counterparts.test.cpp
 documentation_of: ds/detail/rollback_journal.hpp
 layout: document
 redirect_from:

@@ -1023,14 +1023,14 @@ data:
   path: math/fps/half_gcd.hpp
   requiredBy:
   - math/all.hpp
-  - math/fps/polynomial_roots.hpp
   - math/fps/all.hpp
+  - math/fps/polynomial_roots.hpp
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/polynomial_roots.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/half_gcd.test.cpp
 documentation_of: math/fps/half_gcd.hpp
 layout: document

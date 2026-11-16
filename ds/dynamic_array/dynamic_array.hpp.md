@@ -387,8 +387,8 @@ data:
   timestamp: '2026-06-20 20:05:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_array/dynamic_array.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/dynamic_array/dynamic_array.test.cpp
 documentation_of: ds/dynamic_array/dynamic_array.hpp
 layout: document
 title: Dynamic Array

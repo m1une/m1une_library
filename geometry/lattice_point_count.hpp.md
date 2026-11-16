@@ -250,10 +250,10 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/point_data.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/lattice_point_count.hpp
 layout: document
 title: Lattice-Point Count

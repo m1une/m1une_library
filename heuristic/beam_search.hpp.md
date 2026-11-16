@@ -156,8 +156,8 @@ data:
   timestamp: '2026-08-12 20:17:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/heuristic/simulated_annealing.test.cpp
   - verify/heuristic/beam_search.test.cpp
+  - verify/heuristic/simulated_annealing.test.cpp
 documentation_of: heuristic/beam_search.hpp
 layout: document
 title: Beam Search

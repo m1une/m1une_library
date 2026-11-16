@@ -413,13 +413,13 @@ data:
   timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/min_plus_convolution_convex_convex.test.cpp
-  - verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
   - verify/convex/max_plus_convolution_concave_concave.test.cpp
+  - verify/convex/min_plus_convolution_convex_convex.test.cpp
   - verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
-  - verify/convex/monge/monge_algorithms.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/ordered_matrix.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
 documentation_of: convex/min_plus_convolution.hpp
 layout: document
 title: Structured Min-Plus and Max-Plus Convolution

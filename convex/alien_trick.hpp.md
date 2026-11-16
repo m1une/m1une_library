@@ -84,10 +84,10 @@ data:
   timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/alien_trick.test.cpp
-  - verify/convex/monge/monge_algorithms.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/ordered_matrix.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/alien_trick.test.cpp
 documentation_of: convex/alien_trick.hpp
 layout: document
 title: Alien Trick

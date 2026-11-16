@@ -388,8 +388,8 @@ data:
   timestamp: '2026-10-24 12:29:25+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/segtree/rollback_lazy_segtree.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/segtree/rollback_lazy_segtree.test.cpp
 documentation_of: ds/segtree/rollback_lazy_segtree.hpp
 layout: document
 title: Rollback Lazy Segment Tree
