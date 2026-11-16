@@ -84,6 +84,7 @@ does not itself guarantee that sums or products cannot overflow.
 | Point assignment and range aggregate | [Segment tree](https://m1une.github.io/m1une_library/ds/segtree/segtree.hpp) | A monoid. |
 | Range update and range aggregate | [Lazy segment tree](https://m1une.github.io/m1une_library/ds/segtree/lazy_segtree.hpp) | An acted monoid whose updates apply to each aggregate. |
 | Range update and point query | [Dual segment tree](https://m1une.github.io/m1une_library/ds/segtree/dual_segtree.hpp) | A monoid that composes the updates. |
+| Sparse range assignment and run enumeration | [Interval map](https://m1une.github.io/m1une_library/ds/interval_set/interval_map.hpp) | Equality-comparable labels; updates visit the overwritten runs. |
 | Static range minimum/maximum | [Sparse table](https://m1une.github.io/m1une_library/ds/range_query/sparse_table.hpp) | An idempotent monoid: `op(x, x) == x`. |
 | Static range aggregate | [Disjoint sparse table](https://m1une.github.io/m1une_library/ds/range_query/disjoint_sparse_table.hpp) | Any monoid. |
 | Queue with an aggregate | [Sliding window aggregation](https://m1une.github.io/m1une_library/ds/range_query/sliding_window_aggregation.hpp) | Any monoid. |
