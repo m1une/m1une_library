@@ -124,6 +124,9 @@ data:
     path: verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
     title: verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
     title: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
   - icon: ':heavy_check_mark:'
@@ -820,6 +823,7 @@ data:
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/range_parallel_dsu.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/matroid/matroids.test.cpp

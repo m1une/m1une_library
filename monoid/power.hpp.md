@@ -10,6 +10,9 @@ data:
     title: Range Update Range Product
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
   - icon: ':heavy_check_mark:'
@@ -65,6 +68,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
   - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/power.hpp
 layout: document

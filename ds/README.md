@@ -20,7 +20,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | [`deque/`](deque/) | Persistent and rollback real-time double-ended queues |
 | [`queue/`](queue/) | Persistent and rollback real-time FIFO queues |
 | [`stack/`](stack/) | Persistent and rollback constant-time LIFO stacks |
-| [`interval_set/`](interval_set/) | Disjoint interval set with insertion, deletion, and covered-point queries |
+| [`interval_set/`](interval_set/) | [`IntervalSet`](interval_set/interval_set.hpp) for coverage and [`IntervalMap`](interval_set/interval_map.hpp) for piecewise-constant values, range assignment, erasure, and callbacks |
 | [`hash_table/`](hash_table/) | `hash_map.hpp`, `hash_set.hpp`, and their shared implementation |
 
 Include headers from the repository root:

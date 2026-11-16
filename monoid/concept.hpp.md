@@ -178,6 +178,12 @@ data:
     path: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
     title: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_cow.test.cpp
     title: verify/ds/persistent_cow.test.cpp
   - icon: ':heavy_check_mark:'
@@ -429,6 +435,8 @@ data:
   - verify/ds/dsu/rollback_potentialized_dsu.test.cpp
   - verify/ds/dsu/dsu_monoid.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
   - verify/ds/binary_trie/binary_trie_monoid.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp

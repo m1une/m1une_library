@@ -123,7 +123,7 @@ under `m1une::algo`.
 | `ds/deque/` | Persistent and rollback real-time double-ended queues. |
 | `ds/queue/` | Persistent and rollback real-time FIFO queues. |
 | `ds/stack/` | Persistent and rollback constant-time LIFO stacks. |
-| `ds/interval_set/` | Disjoint interval maintenance. |
+| `ds/interval_set/` | Disjoint interval sets and piecewise-constant interval maps with assignment, erasure, and callbacks. |
 | `ds/hash_table/` | Hash maps and hash sets. |
 
 See [`ds/README.md`](ds/README.md) for the complete header index.

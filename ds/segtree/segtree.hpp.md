@@ -13,6 +13,9 @@ data:
     title: Range Sort Range Composite
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_sort_range_composite.test.cpp
     title: verify/ds/range_query/range_sort_range_composite.test.cpp
   - icon: ':heavy_check_mark:'
@@ -217,6 +220,7 @@ data:
   verifiedWith:
   - verify/ds/segtree/segtree.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
 documentation_of: ds/segtree/segtree.hpp
 layout: document
 title: Segment Tree

@@ -415,6 +415,9 @@ data:
   - name: ds/interval_set
     pages:
     - icon: ':heavy_check_mark:'
+      path: ds/interval_set/interval_map.hpp
+      title: Interval Map
+    - icon: ':heavy_check_mark:'
       path: ds/interval_set/interval_set.hpp
       title: Interval Set
   - name: ds/queue
@@ -1758,6 +1761,9 @@ data:
       title: verify/ds/heap/meldable_heap.test.cpp
   - name: verify/ds/interval_set
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/interval_set/interval_map.test.cpp
+      title: verify/ds/interval_set/interval_map.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/interval_set/interval_set.test.cpp
       title: verify/ds/interval_set/interval_set.test.cpp

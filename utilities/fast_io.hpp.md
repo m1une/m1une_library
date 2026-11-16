@@ -244,6 +244,9 @@ data:
     path: verify/ds/heap/meldable_heap.test.cpp
     title: verify/ds/heap/meldable_heap.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/interval_set/interval_set.test.cpp
     title: verify/ds/interval_set/interval_set.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1898,6 +1901,7 @@ data:
   - verify/ds/dsu/persistent_dsu_library_checker.test.cpp
   - verify/ds/dsu/dsu_monoid.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
   - verify/ds/interval_set/interval_set.test.cpp
   - verify/ds/queue/persistent_queue.test.cpp
   - verify/ds/binary_trie/binary_trie.test.cpp

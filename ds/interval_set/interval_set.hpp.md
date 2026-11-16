@@ -233,4 +233,7 @@ int main() {
 
 This data structure represents the covered set itself.
 
+To associate values with intervals and overwrite ranges, use
+[IntervalMap](https://m1une.github.io/m1une_library/ds/interval_set/interval_map.hpp).
+
 To manage free intervals in a universe `[0, N)`, first insert `[0, N)`, and then erase occupied intervals.

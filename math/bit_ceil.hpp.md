@@ -49,6 +49,9 @@ data:
     path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
     title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/interval_set/interval_map.test.cpp
+    title: verify/ds/interval_set/interval_map.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/merge_sort_tree.test.cpp
     title: verify/ds/range_query/merge_sort_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -133,6 +136,7 @@ data:
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/merge_sort_tree.test.cpp
   - verify/ds/range_query/merge_sort_tree_sum.test.cpp
+  - verify/ds/interval_set/interval_map.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
