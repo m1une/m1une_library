@@ -1,4 +1,5 @@
 {
+"verify/acted_monoid/range_add_range_gcd.test.cpp": "2026-11-17 02:00:41 +0900",
 "verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp": "2026-10-24 12:29:25 +0900",
 "verify/algo/dp/knapsack.test.cpp": "2026-10-06 01:57:24 +0900",
 "verify/algo/dp/knuth_optimization.test.cpp": "2026-10-30 15:56:19 +0900",
