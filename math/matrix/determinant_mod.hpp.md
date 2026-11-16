@@ -252,8 +252,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
   - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
 documentation_of: math/matrix/determinant_mod.hpp
 layout: document
 title: Determinant Modulo a Composite Modulus

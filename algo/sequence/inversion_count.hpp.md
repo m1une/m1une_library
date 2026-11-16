@@ -56,8 +56,8 @@ data:
   isVerificationFile: false
   path: algo/sequence/inversion_count.hpp
   requiredBy:
-  - algo/all.hpp
   - algo/sequence/all.hpp
+  - algo/all.hpp
   - examples/stress/main.cpp
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC

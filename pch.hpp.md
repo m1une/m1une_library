@@ -98,9 +98,9 @@ data:
   isVerificationFile: false
   path: pch.hpp
   requiredBy:
+  - main.cpp
   - examples/stress/main.cpp
   - examples/stress/brute.cpp
-  - main.cpp
   timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []

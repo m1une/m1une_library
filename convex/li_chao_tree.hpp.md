@@ -230,9 +230,9 @@ data:
   verifiedWith:
   - verify/convex/li_chao_tree.test.cpp
   - verify/convex/li_chao_tree_segment.test.cpp
-  - verify/convex/monge/ordered_matrix.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
 documentation_of: convex/li_chao_tree.hpp
 layout: document
 title: Li Chao Tree

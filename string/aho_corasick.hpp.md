@@ -238,8 +238,8 @@ data:
   timestamp: '2026-06-23 02:00:16+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/aho_corasick.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/aho_corasick.hpp
 layout: document
 title: Aho-Corasick

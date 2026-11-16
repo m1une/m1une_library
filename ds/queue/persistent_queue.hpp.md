@@ -381,8 +381,8 @@ data:
   timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/queue/persistent_queue.test.cpp
   - verify/ds/persistent_release.test.cpp
+  - verify/ds/queue/persistent_queue.test.cpp
 documentation_of: ds/queue/persistent_queue.hpp
 layout: document
 title: Persistent Queue

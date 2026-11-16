@@ -458,8 +458,8 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
 documentation_of: ds/dynamic_array/dynamic_monoid_array.hpp
 layout: document
 title: Dynamic Monoid Array

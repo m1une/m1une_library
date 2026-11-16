@@ -141,9 +141,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/convex/slope_trick.test.cpp
-  - verify/convex/monge/ordered_matrix.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
 documentation_of: convex/slope_trick.hpp
 layout: document
 title: Slope Trick

@@ -136,14 +136,14 @@ data:
   timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/ordered_matrix.test.cpp
-  - verify/convex/monge/ordered_matrix.test.cpp
   - verify/convex/monge/anti_monge_shortest_path.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_shortest_path.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
 documentation_of: convex/monge/larsch.hpp
 layout: document
 title: LARSCH Online Matrix Minima

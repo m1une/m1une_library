@@ -1,0 +1,661 @@
+---
+data:
+  _extendedDependsOn:
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/concept.hpp
+    title: Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/concept.hpp
+    title: Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_add_range_gcd.hpp
+    title: Range Add Range GCD
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/lazy_segtree.hpp
+    title: Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: math/bit_ceil.hpp
+    title: Bit Ceil
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
+  _isVerificationFailed: false
+  _pathExtension: cpp
+  _verificationStatusIcon: ':heavy_check_mark:'
+  attributes:
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://yukicoder.me/problems/no/1036
+    links:
+    - https://yukicoder.me/problems/no/1036
+  bundledCode: "#line 1 \"verify/acted_monoid/range_add_range_gcd.test.cpp\"\n#define\
+    \ PROBLEM \"https://yukicoder.me/problems/no/1036\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <cstdint>\n#include <limits>\n#include <numeric>\n\
+    #include <vector>\n\n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#include <concepts>\n\
+    \nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
+    \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
+    \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
+    \                                 typename AM::operator_type g) {\n    // 1. Value\
+    \ Monoid\n    typename AM::value_type;\n    { AM::id() } -> std::same_as<typename\
+    \ AM::value_type>;\n    { AM::op(a, b) } -> std::same_as<typename AM::value_type>;\n\
+    \n    // 2. Operator Monoid\n    typename AM::operator_type;\n    { AM::op_id()\
+    \ } -> std::same_as<typename AM::operator_type>;\n    { AM::op_comp(f, g) } ->\
+    \ std::same_as<typename AM::operator_type>;  // Composition order: f(g(x))\n\n\
+    \    // 3. Mapping: Operator x Value -> Value\n    { AM::mapping(f, a) } -> std::same_as<typename\
+    \ AM::value_type>;\n};\n\n// Concept for acted monoids whose value monoid is a\
+    \ commutative group.\n// The value operation must obey commutativity and inverse\
+    \ laws.\ntemplate <typename AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM>\
+    \ && requires(typename AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename\
+    \ AM::value_type>;\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
+    \n\n#line 1 \"acted_monoid/range_add_range_gcd.hpp\"\n\n\n\n#line 6 \"acted_monoid/range_add_range_gcd.hpp\"\
+    \n#include <type_traits>\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate\
+    \ <typename T>\nstruct RangeAddRangeGcdNode {\n    T min;\n    T diff_gcd;\n \
+    \   bool empty;\n};\n\n// Range addition preserves the GCD of differences from\
+    \ the minimum.\ntemplate <typename T>\nstruct RangeAddRangeGcd {\n    static_assert(std::is_integral_v<T>\
+    \ && std::is_signed_v<T>);\n\n    using value_type = RangeAddRangeGcdNode<T>;\n\
+    \    using operator_type = T;\n    static constexpr bool commutative = true;\n\
+    \    static constexpr bool operator_commutative = true;\n\n    static constexpr\
+    \ value_type id() {\n        return {T(0), T(0), true};\n    }\n    static constexpr\
+    \ value_type op(const value_type& a, const value_type& b) {\n        if (a.empty)\
+    \ return b;\n        if (b.empty) return a;\n        return {std::min(a.min, b.min),\n\
+    \                std::gcd(std::gcd(a.diff_gcd, b.diff_gcd), T(a.min - b.min)),\
+    \ false};\n    }\n\n    static constexpr operator_type op_id() {\n        return\
+    \ T(0);\n    }\n    // Returns f(g(x)).\n    static constexpr operator_type op_comp(const\
+    \ operator_type& f, const operator_type& g) {\n        return f + g;\n    }\n\n\
+    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
+    \ x) {\n        if (x.empty) return x;\n        return {T(x.min + f), x.diff_gcd,\
+    \ false};\n    }\n\n    static constexpr value_type make(const T& val) {\n   \
+    \     return {val, T(0), false};\n    }\n    // Returns a nonnegative GCD, or\
+    \ zero for an empty range.\n    static constexpr T gcd(const value_type& x) {\n\
+    \        return std::gcd(x.min, x.diff_gcd);\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"ds/segtree/lazy_segtree.hpp\"\n\n\n\n#include\
+    \ <bit>\n#line 7 \"ds/segtree/lazy_segtree.hpp\"\n#include <utility>\n#line 9\
+    \ \"ds/segtree/lazy_segtree.hpp\"\n\n#line 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace\
+    \ m1une {\nnamespace math {\n\ntemplate <typename T>\nconstexpr T bit_ceil(T n)\
+    \ {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n) x <<= 1;\n   \
+    \ return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 12 \"\
+    ds/segtree/lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n// A highly\
+    \ generic Lazy Segment Tree utilizing C++20 Concepts for type safety.\n// It operates\
+    \ on any Acted Monoid structure satisfying the `m1une::acted_monoid::IsActedMonoid`\
+    \ concept.\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\nstruct\
+    \ LazySegtree {\n    using T = typename ActedMonoid::value_type;\n    using F\
+    \ = typename ActedMonoid::operator_type;\n\n   private:\n    int _n, _size, _log;\n\
+    \    std::vector<T> _d;\n    std::vector<F> _lz;\n\n    // Recalculates the value\
+    \ of the node k from its children.\n    void update(int k) {\n        _d[k] =\
+    \ ActedMonoid::op(_d[2 * k], _d[2 * k + 1]);\n    }\n\n    static T mapping_at(const\
+    \ F& f, const T& value, long long ord) {\n        if constexpr (requires(F g,\
+    \ T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n            return\
+    \ ActedMonoid::mapping(f, value, ord);\n        } else {\n            return ActedMonoid::mapping(f,\
+    \ value);\n        }\n    }\n\n    static F shift_operator(const F& f, long long\
+    \ ord) {\n        if constexpr (requires(F g, long long i) { ActedMonoid::op_shift(g,\
+    \ i); }) {\n            return ActedMonoid::op_shift(f, ord);\n        } else\
+    \ {\n            return f;\n        }\n    }\n\n    int node_length(int k) const\
+    \ {\n        int level = std::bit_width((unsigned int)k) - 1;\n        return\
+    \ _size >> level;\n    }\n\n    int node_left(int k) const {\n        int level\
+    \ = std::bit_width((unsigned int)k) - 1;\n        int len = _size >> level;\n\
+    \        return (k - (1 << level)) * len;\n    }\n\n    // Applies the operator\
+    \ f to the node k and updates its lazy tag if it's an internal node.\n    void\
+    \ all_apply(int k, F f) {\n        _d[k] = mapping_at(f, _d[k], 0);\n        if\
+    \ (k < _size) {\n            _lz[k] = ActedMonoid::op_comp(f, _lz[k]);\n     \
+    \   }\n    }\n\n    // Propagates the lazy tag of the node k down to its children.\n\
+    \    void push(int k) {\n        all_apply(2 * k, _lz[k]);\n        all_apply(2\
+    \ * k + 1, shift_operator(_lz[k], node_length(k) / 2));\n        _lz[k] = ActedMonoid::op_id();\n\
+    \    }\n\n   public:\n    // Constructs an empty lazy segment tree.\n    LazySegtree()\
+    \ : LazySegtree(0) {}\n\n    // Constructs a lazy segment tree of size `n`, initialized\
+    \ with the identity element.\n    explicit LazySegtree(int n) : LazySegtree(std::vector<T>(n,\
+    \ ActedMonoid::id())) {}\n\n    // Constructs a lazy segment tree from an existing\
+    \ vector.\n    explicit LazySegtree(const std::vector<T>& v) : _n(int(v.size()))\
+    \ {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n        _log\
+    \ = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n       \
+    \ _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n\
+    \        for (int i = 0; i < _n; i++) _d[_size + i] = v[i];\n        for (int\
+    \ i = _size - 1; i >= 1; i--) update(i);\n    }\n    explicit LazySegtree(std::vector<T>&&\
+    \ v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n\
+    \        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n\
+    \        _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n\
+    \        for (int i = 0; i < _n; i++) _d[_size + i] = std::move(v[i]);\n     \
+    \   for (int i = _size - 1; i >= 1; i--) update(i);\n    }\n\n    // Constructs\
+    \ a lazy segment tree from a vector of a different type U.\n    // It automatically\
+    \ adapts to the Monoid's initialization requirements:\n    // 1. ActedMonoid::make(val)\
+    \ if it exists.\n    // 2. ActedMonoid::make(val, index) if the monoid requires\
+    \ global indices.\n    // 3. static_cast<T>(val) as a fallback for simple monoids.\n\
+    \    template <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U\
+    \ x) { ActedMonoid::make(x); } ||\n        requires(U x, int i) { ActedMonoid::make(x,\
+    \ i); } ||\n        std::convertible_to<U, T>\n    )\n    explicit LazySegtree(const\
+    \ std::vector<U>& v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned\
+    \ int)(_n));\n        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size))\
+    \ _log++;\n        _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size,\
+    \ ActedMonoid::op_id());\n        for (int i = 0; i < _n; i++) {\n           \
+    \ if constexpr (requires(U x) { ActedMonoid::make(x); }) {\n                _d[_size\
+    \ + i] = ActedMonoid::make(v[i]);\n            } else if constexpr (requires(U\
+    \ x, int idx) { ActedMonoid::make(x, idx); }) {\n                _d[_size + i]\
+    \ = ActedMonoid::make(v[i], i);\n            } else {\n                _d[_size\
+    \ + i] = static_cast<T>(v[i]);\n            }\n        }\n        for (int i =\
+    \ _size - 1; i >= 1; i--) update(i);\n    }\n\n    // Returns the number of elements.\n\
+    \    int size() const {\n        return _n;\n    }\n\n    // Returns whether the\
+    \ tree is empty.\n    bool empty() const {\n        return _n == 0;\n    }\n\n\
+    \    // Assigns x to the p-th element.\n    void set(int p, T x) {\n        assert(0\
+    \ <= p && p < _n);\n        p += _size;\n        for (int i = _log; i >= 1; i--)\
+    \ push(p >> i);\n        _d[p] = x;\n        for (int i = 1; i <= _log; i++) update(p\
+    \ >> i);\n    }\n\n    // Returns the value of the p-th element.\n    T get(int\
+    \ p) {\n        assert(0 <= p && p < _n);\n        p += _size;\n        for (int\
+    \ i = _log; i >= 1; i--) push(p >> i);\n        return _d[p];\n    }\n\n    //\
+    \ Returns the value of the p-th element.\n    T operator[](int p) {\n        return\
+    \ get(p);\n    }\n\n    // Returns the product (result of the monoid operation)\
+    \ in the range [l, r).\n    T prod(int l, int r) {\n        assert(0 <= l && l\
+    \ <= r && r <= _n);\n        if (l == r) return ActedMonoid::id();\n\n       \
+    \ l += _size;\n        r += _size;\n\n        for (int i = _log; i >= 1; i--)\
+    \ {\n            if (((l >> i) << i) != l) push(l >> i);\n            if (((r\
+    \ >> i) << i) != r) push((r - 1) >> i);\n        }\n\n        T sml = ActedMonoid::id(),\
+    \ smr = ActedMonoid::id();\n        while (l < r) {\n            if (l & 1) sml\
+    \ = ActedMonoid::op(sml, _d[l++]);\n            if (r & 1) smr = ActedMonoid::op(_d[--r],\
+    \ smr);\n            l >>= 1;\n            r >>= 1;\n        }\n\n        return\
+    \ ActedMonoid::op(sml, smr);\n    }\n\n    // Returns the product of the entire\
+    \ array.\n    T all_prod() const {\n        return _d[1];\n    }\n\n    // Returns\
+    \ all elements as a vector.\n    std::vector<T> to_vector() {\n        for (int\
+    \ k = 1; k < _size; k++) push(k);\n        std::vector<T> res;\n        res.reserve(_n);\n\
+    \        for (int i = 0; i < _n; i++) res.push_back(_d[_size + i]);\n        return\
+    \ res;\n    }\n\n    // Returns the elements in the range [l, r) as a vector.\n\
+    \    std::vector<T> to_vector(int l, int r) {\n        assert(0 <= l && l <= r\
+    \ && r <= _n);\n        std::vector<T> res;\n        res.reserve(r - l);\n   \
+    \     for (int i = l; i < r; i++) res.push_back(get(i));\n        return res;\n\
+    \    }\n\n    // Applies the operator f to the p-th element.\n    void apply(int\
+    \ p, F f) {\n        assert(0 <= p && p < _n);\n        p += _size;\n        for\
+    \ (int i = _log; i >= 1; i--) push(p >> i);\n        _d[p] = mapping_at(f, _d[p],\
+    \ 0);\n        for (int i = 1; i <= _log; i++) update(p >> i);\n    }\n\n    //\
+    \ Applies the operator f to all elements in the range [l, r).\n    void apply(int\
+    \ l, int r, F f) {\n        assert(0 <= l && l <= r && r <= _n);\n        if (l\
+    \ == r) return;\n\n        int base_l = l;\n        l += _size;\n        r +=\
+    \ _size;\n\n        for (int i = _log; i >= 1; i--) {\n            if (((l >>\
+    \ i) << i) != l) push(l >> i);\n            if (((r >> i) << i) != r) push((r\
+    \ - 1) >> i);\n        }\n\n        {\n            int l2 = l, r2 = r;\n     \
+    \       while (l < r) {\n                if (l & 1) {\n                    all_apply(l,\
+    \ shift_operator(f, node_left(l) - base_l));\n                    l++;\n     \
+    \           }\n                if (r & 1) {\n                    --r;\n      \
+    \              all_apply(r, shift_operator(f, node_left(r) - base_l));\n     \
+    \           }\n                l >>= 1;\n                r >>= 1;\n          \
+    \  }\n            l = l2;\n            r = r2;\n        }\n\n        for (int\
+    \ i = 1; i <= _log; i++) {\n            if (((l >> i) << i) != l) update(l >>\
+    \ i);\n            if (((r >> i) << i) != r) update((r - 1) >> i);\n        }\n\
+    \    }\n\n    // Finds the largest r such that g(prod(l, r)) is true.\n    template\
+    \ <class F_pred>\n    int max_right(int l, F_pred g) {\n        assert(0 <= l\
+    \ && l <= _n);\n        assert(g(ActedMonoid::id()));\n        if (l == _n) return\
+    \ _n;\n        l += _size;\n        for (int i = _log; i >= 1; i--) push(l >>\
+    \ i);\n        T sm = ActedMonoid::id();\n        do {\n            while (l %\
+    \ 2 == 0) l >>= 1;\n            if (!g(ActedMonoid::op(sm, _d[l]))) {\n      \
+    \          while (l < _size) {\n                    push(l);\n               \
+    \     l = (2 * l);\n                    if (g(ActedMonoid::op(sm, _d[l]))) {\n\
+    \                        sm = ActedMonoid::op(sm, _d[l]);\n                  \
+    \      l++;\n                    }\n                }\n                return\
+    \ l - _size;\n            }\n            sm = ActedMonoid::op(sm, _d[l]);\n  \
+    \          l++;\n        } while ((l & -l) != l);\n        return _n;\n    }\n\
+    \n    // Finds the smallest l such that g(prod(l, r)) is true.\n    template <class\
+    \ F_pred>\n    int min_left(int r, F_pred g) {\n        assert(0 <= r && r <=\
+    \ _n);\n        assert(g(ActedMonoid::id()));\n        if (r == 0) return 0;\n\
+    \        r += _size;\n        for (int i = _log; i >= 1; i--) push((r - 1) >>\
+    \ i);\n        T sm = ActedMonoid::id();\n        do {\n            r--;\n   \
+    \         while (r > 1 && (r % 2)) r >>= 1;\n            if (!g(ActedMonoid::op(_d[r],\
+    \ sm))) {\n                while (r < _size) {\n                    push(r);\n\
+    \                    r = (2 * r + 1);\n                    if (g(ActedMonoid::op(_d[r],\
+    \ sm))) {\n                        sm = ActedMonoid::op(_d[r], sm);\n        \
+    \                r--;\n                    }\n                }\n            \
+    \    return r + 1 - _size;\n            }\n            sm = ActedMonoid::op(_d[r],\
+    \ sm);\n        } while ((r & -r) != r);\n        return 0;\n    }\n};\n\n}  //\
+    \ namespace ds\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\
+    \n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
+    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n\
+    #include <unistd.h>\n#line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\n\
+    namespace utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\n// Shared\
+    \ with the convenience helpers in template.hpp.\ninline FastOutput* standard_output_instance\
+    \ = nullptr;\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
+    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
+    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
+    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
+    \ s.data() + position, copied);\n            _position += int(copied);\n     \
+    \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
+    \      write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 14 \"verify/acted_monoid/range_add_range_gcd.test.cpp\"\n\n\
+    namespace {\n\nusing AM = m1une::acted_monoid::RangeAddRangeGcd<long long>;\n\n\
+    static_assert(m1une::acted_monoid::IsActedMonoid<AM>);\nstatic_assert(AM::commutative\
+    \ && AM::operator_commutative);\nstatic_assert(AM::gcd(AM::id()) == 0);\nstatic_assert(AM::gcd(AM::make(-12))\
+    \ == 12);\nstatic_assert(AM::gcd(AM::mapping(2, AM::op(AM::make(6), AM::make(10))))\
+    \ == 4);\n\ntemplate <typename Node>\nbool same(const Node& a, const Node& b)\
+    \ {\n    return a.min == b.min && a.diff_gcd == b.diff_gcd && a.empty == b.empty;\n\
+    }\n\nstd::uint64_t state = 3141592653589793ULL;\nstd::uint64_t random_number()\
+    \ {\n    state ^= state << 7;\n    state ^= state >> 9;\n    return state;\n}\n\
+    \nvoid test_laws() {\n    auto random_node = []() {\n        auto node = AM::id();\n\
+    \        int n = int(random_number() % 8);\n        for (int i = 0; i < n; ++i)\
+    \ {\n            node = AM::op(node, AM::make(static_cast<long long>(random_number()\
+    \ % 101) - 50));\n        }\n        return node;\n    };\n    for (int trial\
+    \ = 0; trial < 5000; ++trial) {\n        auto a = random_node(), b = random_node(),\
+    \ c = random_node();\n        long long f = static_cast<long long>(random_number()\
+    \ % 101) - 50;\n        long long g = static_cast<long long>(random_number() %\
+    \ 101) - 50;\n        long long h = static_cast<long long>(random_number() % 101)\
+    \ - 50;\n        assert(same(AM::op(AM::id(), a), a));\n        assert(same(AM::op(a,\
+    \ AM::id()), a));\n        assert(same(AM::op(a, b), AM::op(b, a)));\n       \
+    \ assert(same(AM::op(AM::op(a, b), c), AM::op(a, AM::op(b, c))));\n        assert(same(AM::mapping(f,\
+    \ AM::id()), AM::id()));\n        assert(same(AM::mapping(AM::op_id(), a), a));\n\
+    \        assert(AM::op_comp(f, AM::op_id()) == f);\n        assert(AM::op_comp(AM::op_id(),\
+    \ f) == f);\n        assert(AM::op_comp(f, g) == AM::op_comp(g, f));\n       \
+    \ assert(AM::op_comp(AM::op_comp(f, g), h) == AM::op_comp(f, AM::op_comp(g, h)));\n\
+    \        assert(same(AM::mapping(AM::op_comp(f, g), a), AM::mapping(f, AM::mapping(g,\
+    \ a))));\n        assert(same(AM::mapping(f, AM::op(a, b)),\n                \
+    \    AM::op(AM::mapping(f, a), AM::mapping(f, b))));\n    }\n}\n\ntemplate <typename\
+    \ T>\nvoid check_range(m1une::ds::LazySegtree<m1une::acted_monoid::RangeAddRangeGcd<T>>&\
+    \ seg,\n                 const std::vector<T>& values, int l, int r) {\n    using\
+    \ M = m1une::acted_monoid::RangeAddRangeGcd<T>;\n    T expected = 0;\n    for\
+    \ (int i = l; i < r; ++i) expected = std::gcd(expected, values[i]);\n    auto\
+    \ node = seg.prod(l, r);\n    assert(M::gcd(node) == expected);\n    assert(node.empty\
+    \ == (l == r));\n    if (l < r) {\n        T minimum = *std::min_element(values.begin()\
+    \ + l, values.begin() + r);\n        T differences = 0;\n        for (int i =\
+    \ l; i < r; ++i) differences = std::gcd(differences, T(values[i] - minimum));\n\
+    \        assert(node.min == minimum && node.diff_gcd == differences);\n    } else\
+    \ {\n        assert(same(node, M::id()));\n    }\n}\n\ntemplate <typename T>\n\
+    void test_randomized() {\n    using M = m1une::acted_monoid::RangeAddRangeGcd<T>;\n\
+    \    for (int n : {0, 1, 2, 3, 7, 16, 31, 32, 33, 73}) {\n        std::vector<T>\
+    \ values(n, T(0));\n        m1une::ds::LazySegtree<M> seg(values);\n        for\
+    \ (int step = 0; step < 2000; ++step) {\n            int l = int(random_number()\
+    \ % (n + 1));\n            int r = int(random_number() % (n + 1));\n         \
+    \   if (r < l) std::swap(l, r);\n            T delta = T(static_cast<long long>(random_number()\
+    \ % 201) - 100);\n            int type = int(random_number() % 5);\n         \
+    \   if (type <= 1) {\n                if (type == 0) l = 0, r = n;\n         \
+    \       seg.apply(l, r, delta);\n                for (int i = l; i < r; ++i) values[i]\
+    \ += delta;\n            } else if (n > 0 && type <= 3) {\n                int\
+    \ p = int(random_number() % n);\n                if (type == 2) {\n          \
+    \          seg.set(p, M::make(delta));\n                    values[p] = delta;\n\
+    \                } else {\n                    seg.apply(p, delta);\n        \
+    \            values[p] += delta;\n                }\n                assert(same(seg.get(p),\
+    \ M::make(values[p])));\n            }\n            check_range(seg, values, l,\
+    \ r);\n            check_range(seg, values, 0, n);\n            assert(same(seg.prod(0,\
+    \ n), seg.all_prod()));\n        }\n        for (int l = 0; l <= n; ++l) {\n \
+    \           for (int r = l; r <= n; ++r) check_range(seg, values, l, r);\n   \
+    \     }\n    }\n}\n\nvoid test_boundaries() {\n    assert(!AM::make(0).empty);\n\
+    \    assert(same(AM::mapping(17, AM::id()), AM::id()));\n    assert(AM::gcd(AM::mapping(-12,\
+    \ AM::make(12))) == 0);\n    for (long long value : {0LL, -12LL, 12LL,\n     \
+    \                       std::numeric_limits<long long>::min() + 1,\n         \
+    \                   std::numeric_limits<long long>::max()}) {\n        std::vector<long\
+    \ long> values(5, value);\n        m1une::ds::LazySegtree<AM> seg(values);\n \
+    \       check_range(seg, values, 0, 5);\n        check_range(seg, values, 1, 4);\n\
+    \        // Shift to zero, then away from zero without overflowing composed tags.\n\
+    \        seg.apply(0, 5, -value);\n        assert(AM::gcd(seg.all_prod()) == 0);\n\
+    \        seg.apply(0, 5, value > 0 ? 12 : -12);\n        assert(AM::gcd(seg.all_prod())\
+    \ == 12);\n    }\n    long long large = std::numeric_limits<long long>::max()\
+    \ / 3;\n    auto mixed = AM::op(AM::make(-large), AM::make(large));\n    assert(mixed.min\
+    \ == -large && mixed.diff_gcd == 2 * large);\n    assert(AM::gcd(mixed) == large);\n\
+    }\n\n}  // namespace\n\nint main() {\n    test_laws();\n    test_randomized<int>();\n\
+    \    test_randomized<long long>();\n    test_boundaries();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    int n;\n    input >> n;\n\
+    \    std::vector<long long> values(n);\n    for (long long& value : values) input\
+    \ >> value;\n    m1une::ds::LazySegtree<AM> seg(values);\n    long long answer\
+    \ = 0;\n    for (int l = 0; l < n; ++l) {\n        int r = seg.max_right(l, [](const\
+    \ AM::value_type& x) { return AM::gcd(x) != 1; });\n        answer += n - r;\n\
+    \    }\n    output << answer << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://yukicoder.me/problems/no/1036\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <cstdint>\n#include <limits>\n#include <numeric>\n\
+    #include <vector>\n\n#include \"../../acted_monoid/concept.hpp\"\n#include \"\
+    ../../acted_monoid/range_add_range_gcd.hpp\"\n#include \"../../ds/segtree/lazy_segtree.hpp\"\
+    \n#include \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing AM = m1une::acted_monoid::RangeAddRangeGcd<long\
+    \ long>;\n\nstatic_assert(m1une::acted_monoid::IsActedMonoid<AM>);\nstatic_assert(AM::commutative\
+    \ && AM::operator_commutative);\nstatic_assert(AM::gcd(AM::id()) == 0);\nstatic_assert(AM::gcd(AM::make(-12))\
+    \ == 12);\nstatic_assert(AM::gcd(AM::mapping(2, AM::op(AM::make(6), AM::make(10))))\
+    \ == 4);\n\ntemplate <typename Node>\nbool same(const Node& a, const Node& b)\
+    \ {\n    return a.min == b.min && a.diff_gcd == b.diff_gcd && a.empty == b.empty;\n\
+    }\n\nstd::uint64_t state = 3141592653589793ULL;\nstd::uint64_t random_number()\
+    \ {\n    state ^= state << 7;\n    state ^= state >> 9;\n    return state;\n}\n\
+    \nvoid test_laws() {\n    auto random_node = []() {\n        auto node = AM::id();\n\
+    \        int n = int(random_number() % 8);\n        for (int i = 0; i < n; ++i)\
+    \ {\n            node = AM::op(node, AM::make(static_cast<long long>(random_number()\
+    \ % 101) - 50));\n        }\n        return node;\n    };\n    for (int trial\
+    \ = 0; trial < 5000; ++trial) {\n        auto a = random_node(), b = random_node(),\
+    \ c = random_node();\n        long long f = static_cast<long long>(random_number()\
+    \ % 101) - 50;\n        long long g = static_cast<long long>(random_number() %\
+    \ 101) - 50;\n        long long h = static_cast<long long>(random_number() % 101)\
+    \ - 50;\n        assert(same(AM::op(AM::id(), a), a));\n        assert(same(AM::op(a,\
+    \ AM::id()), a));\n        assert(same(AM::op(a, b), AM::op(b, a)));\n       \
+    \ assert(same(AM::op(AM::op(a, b), c), AM::op(a, AM::op(b, c))));\n        assert(same(AM::mapping(f,\
+    \ AM::id()), AM::id()));\n        assert(same(AM::mapping(AM::op_id(), a), a));\n\
+    \        assert(AM::op_comp(f, AM::op_id()) == f);\n        assert(AM::op_comp(AM::op_id(),\
+    \ f) == f);\n        assert(AM::op_comp(f, g) == AM::op_comp(g, f));\n       \
+    \ assert(AM::op_comp(AM::op_comp(f, g), h) == AM::op_comp(f, AM::op_comp(g, h)));\n\
+    \        assert(same(AM::mapping(AM::op_comp(f, g), a), AM::mapping(f, AM::mapping(g,\
+    \ a))));\n        assert(same(AM::mapping(f, AM::op(a, b)),\n                \
+    \    AM::op(AM::mapping(f, a), AM::mapping(f, b))));\n    }\n}\n\ntemplate <typename\
+    \ T>\nvoid check_range(m1une::ds::LazySegtree<m1une::acted_monoid::RangeAddRangeGcd<T>>&\
+    \ seg,\n                 const std::vector<T>& values, int l, int r) {\n    using\
+    \ M = m1une::acted_monoid::RangeAddRangeGcd<T>;\n    T expected = 0;\n    for\
+    \ (int i = l; i < r; ++i) expected = std::gcd(expected, values[i]);\n    auto\
+    \ node = seg.prod(l, r);\n    assert(M::gcd(node) == expected);\n    assert(node.empty\
+    \ == (l == r));\n    if (l < r) {\n        T minimum = *std::min_element(values.begin()\
+    \ + l, values.begin() + r);\n        T differences = 0;\n        for (int i =\
+    \ l; i < r; ++i) differences = std::gcd(differences, T(values[i] - minimum));\n\
+    \        assert(node.min == minimum && node.diff_gcd == differences);\n    } else\
+    \ {\n        assert(same(node, M::id()));\n    }\n}\n\ntemplate <typename T>\n\
+    void test_randomized() {\n    using M = m1une::acted_monoid::RangeAddRangeGcd<T>;\n\
+    \    for (int n : {0, 1, 2, 3, 7, 16, 31, 32, 33, 73}) {\n        std::vector<T>\
+    \ values(n, T(0));\n        m1une::ds::LazySegtree<M> seg(values);\n        for\
+    \ (int step = 0; step < 2000; ++step) {\n            int l = int(random_number()\
+    \ % (n + 1));\n            int r = int(random_number() % (n + 1));\n         \
+    \   if (r < l) std::swap(l, r);\n            T delta = T(static_cast<long long>(random_number()\
+    \ % 201) - 100);\n            int type = int(random_number() % 5);\n         \
+    \   if (type <= 1) {\n                if (type == 0) l = 0, r = n;\n         \
+    \       seg.apply(l, r, delta);\n                for (int i = l; i < r; ++i) values[i]\
+    \ += delta;\n            } else if (n > 0 && type <= 3) {\n                int\
+    \ p = int(random_number() % n);\n                if (type == 2) {\n          \
+    \          seg.set(p, M::make(delta));\n                    values[p] = delta;\n\
+    \                } else {\n                    seg.apply(p, delta);\n        \
+    \            values[p] += delta;\n                }\n                assert(same(seg.get(p),\
+    \ M::make(values[p])));\n            }\n            check_range(seg, values, l,\
+    \ r);\n            check_range(seg, values, 0, n);\n            assert(same(seg.prod(0,\
+    \ n), seg.all_prod()));\n        }\n        for (int l = 0; l <= n; ++l) {\n \
+    \           for (int r = l; r <= n; ++r) check_range(seg, values, l, r);\n   \
+    \     }\n    }\n}\n\nvoid test_boundaries() {\n    assert(!AM::make(0).empty);\n\
+    \    assert(same(AM::mapping(17, AM::id()), AM::id()));\n    assert(AM::gcd(AM::mapping(-12,\
+    \ AM::make(12))) == 0);\n    for (long long value : {0LL, -12LL, 12LL,\n     \
+    \                       std::numeric_limits<long long>::min() + 1,\n         \
+    \                   std::numeric_limits<long long>::max()}) {\n        std::vector<long\
+    \ long> values(5, value);\n        m1une::ds::LazySegtree<AM> seg(values);\n \
+    \       check_range(seg, values, 0, 5);\n        check_range(seg, values, 1, 4);\n\
+    \        // Shift to zero, then away from zero without overflowing composed tags.\n\
+    \        seg.apply(0, 5, -value);\n        assert(AM::gcd(seg.all_prod()) == 0);\n\
+    \        seg.apply(0, 5, value > 0 ? 12 : -12);\n        assert(AM::gcd(seg.all_prod())\
+    \ == 12);\n    }\n    long long large = std::numeric_limits<long long>::max()\
+    \ / 3;\n    auto mixed = AM::op(AM::make(-large), AM::make(large));\n    assert(mixed.min\
+    \ == -large && mixed.diff_gcd == 2 * large);\n    assert(AM::gcd(mixed) == large);\n\
+    }\n\n}  // namespace\n\nint main() {\n    test_laws();\n    test_randomized<int>();\n\
+    \    test_randomized<long long>();\n    test_boundaries();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    int n;\n    input >> n;\n\
+    \    std::vector<long long> values(n);\n    for (long long& value : values) input\
+    \ >> value;\n    m1une::ds::LazySegtree<AM> seg(values);\n    long long answer\
+    \ = 0;\n    for (int l = 0; l < n; ++l) {\n        int r = seg.max_right(l, [](const\
+    \ AM::value_type& x) { return AM::gcd(x) != 1; });\n        answer += n - r;\n\
+    \    }\n    output << answer << '\\n';\n}\n"
+  dependsOn:
+  - acted_monoid/concept.hpp
+  - acted_monoid/range_add_range_gcd.hpp
+  - ds/segtree/lazy_segtree.hpp
+  - acted_monoid/concept.hpp
+  - math/bit_ceil.hpp
+  - utilities/fast_io.hpp
+  isVerificationFile: true
+  path: verify/acted_monoid/range_add_range_gcd.test.cpp
+  requiredBy: []
+  timestamp: '2026-11-17 02:00:41+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/acted_monoid/range_add_range_gcd.test.cpp
+layout: document
+redirect_from:
+- /verify/verify/acted_monoid/range_add_range_gcd.test.cpp
+- /verify/verify/acted_monoid/range_add_range_gcd.test.cpp.html
+title: verify/acted_monoid/range_add_range_gcd.test.cpp
+---

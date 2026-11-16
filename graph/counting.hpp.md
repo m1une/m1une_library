@@ -1162,8 +1162,8 @@ data:
   verifiedWith:
   - verify/graph/graph_counting.test.cpp
   - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
 documentation_of: graph/counting.hpp
 layout: document
 title: Graph Counting

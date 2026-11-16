@@ -141,8 +141,8 @@ data:
   timestamp: '2026-07-16 21:30:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/rational_approximation.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/rational_approximation.hpp
 layout: document
 title: Rational Approximation

@@ -269,9 +269,9 @@ data:
   verifiedWith:
   - verify/geometry/angle_sort.test.cpp
   - verify/geometry/rational.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/point_data.test.cpp
-  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/angle_sort.hpp
 layout: document
 title: Angle Sort

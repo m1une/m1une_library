@@ -46,16 +46,16 @@ data:
   isVerificationFile: false
   path: heuristic/objective.hpp
   requiredBy:
-  - heuristic/simulated_annealing.hpp
-  - heuristic/all.hpp
-  - heuristic/beam_search.hpp
   - heuristic/hill_climbing.hpp
+  - heuristic/simulated_annealing.hpp
+  - heuristic/beam_search.hpp
+  - heuristic/all.hpp
   timestamp: '2026-08-12 20:17:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/heuristic/hill_climbing.test.cpp
-  - verify/heuristic/beam_search.test.cpp
   - verify/heuristic/simulated_annealing.test.cpp
+  - verify/heuristic/beam_search.test.cpp
 documentation_of: heuristic/objective.hpp
 layout: document
 title: Heuristic Objective

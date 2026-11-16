@@ -37,6 +37,9 @@ data:
     title: Math All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/acted_monoid/range_add_range_gcd.test.cpp
+    title: verify/acted_monoid/range_add_range_gcd.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
     title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
@@ -104,37 +107,38 @@ data:
   isVerificationFile: false
   path: math/bit_ceil.hpp
   requiredBy:
-  - math/all.hpp
-  - ds/segtree/dual_segtree_2d.hpp
   - ds/segtree/dual_segtree.hpp
-  - ds/segtree/lazy_segtree.hpp
   - ds/segtree/segtree_2d.hpp
+  - ds/segtree/dual_segtree_2d.hpp
   - ds/segtree/rollback_segtree_beats.hpp
+  - ds/segtree/segtree.hpp
+  - ds/segtree/lazy_segtree.hpp
   - ds/segtree/segtree_beats.hpp
   - ds/segtree/rollback_lazy_segtree.hpp
-  - ds/segtree/segtree.hpp
   - ds/range_query/range_sort_range_composite.hpp
   - ds/range_query/merge_sort_tree.hpp
+  - math/all.hpp
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/ds/rollback_counterparts.test.cpp
-  - verify/ds/segtree/dual_segtree_2d.test.cpp
-  - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/rollback_lazy_segtree.test.cpp
-  - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/segtree/dual_segtree_2d.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
-  - verify/ds/segtree/dual_segtree.test.cpp
-  - verify/ds/segtree/range_add_range_min.test.cpp
-  - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp
+  - verify/ds/segtree/dual_segtree.test.cpp
+  - verify/ds/segtree/lazy_segtree.test.cpp
+  - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_add_range_min.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
-  - verify/ds/range_query/merge_sort_tree_sum.test.cpp
   - verify/ds/range_query/merge_sort_tree.test.cpp
-  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
-  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/ds/range_query/merge_sort_tree_sum.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/acted_monoid/range_add_range_gcd.test.cpp
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/bit_ceil.hpp
 layout: document
 title: Bit Ceil

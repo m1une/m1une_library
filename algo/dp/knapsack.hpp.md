@@ -192,8 +192,8 @@ data:
   isVerificationFile: false
   path: algo/dp/knapsack.hpp
   requiredBy:
-  - algo/all.hpp
   - algo/dp/all.hpp
+  - algo/all.hpp
   timestamp: '2026-08-12 05:02:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

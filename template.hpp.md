@@ -524,12 +524,12 @@ data:
   isVerificationFile: false
   path: template.hpp
   requiredBy:
+  - pch.hpp
+  - main.cpp
   - examples/stress/wrong.cpp
+  - examples/stress/gen.cpp
   - examples/stress/main.cpp
   - examples/stress/brute.cpp
-  - examples/stress/gen.cpp
-  - main.cpp
-  - pch.hpp
   timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

@@ -88,8 +88,8 @@ data:
   timestamp: '2026-08-24 02:13:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/game/partisan_minimax.test.cpp
   - verify/game/game_algorithms.test.cpp
+  - verify/game/partisan_minimax.test.cpp
 documentation_of: game/partisan_game.hpp
 layout: document
 title: Partisan Game Outcomes

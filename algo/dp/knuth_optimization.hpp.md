@@ -73,8 +73,8 @@ data:
   isVerificationFile: false
   path: algo/dp/knuth_optimization.hpp
   requiredBy:
-  - algo/all.hpp
   - algo/dp/all.hpp
+  - algo/all.hpp
   timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

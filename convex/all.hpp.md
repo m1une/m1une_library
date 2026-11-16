@@ -776,9 +776,9 @@ data:
   timestamp: '2026-10-30 16:04:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/ordered_matrix.test.cpp
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
 documentation_of: convex/all.hpp
 layout: document
 title: Convex All

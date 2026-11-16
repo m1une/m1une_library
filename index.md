@@ -13,6 +13,9 @@ data:
       path: acted_monoid/range_add_range_arg_min.hpp
       title: Range Add Range ArgMin
     - icon: ':heavy_check_mark:'
+      path: acted_monoid/range_add_range_gcd.hpp
+      title: Range Add Range GCD
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_max.hpp
       title: Range Add Range Max
     - icon: ':heavy_check_mark:'
@@ -1488,6 +1491,9 @@ data:
   verificationCategories:
   - name: verify/acted_monoid
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/acted_monoid/range_add_range_gcd.test.cpp
+      title: verify/acted_monoid/range_add_range_gcd.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
       title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
