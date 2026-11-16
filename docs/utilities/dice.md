@@ -134,7 +134,7 @@ example, `arrow(DiceFace::south) == DiceFace::east` means that the arrow painted
 on the south face points toward world east. It does not mean "right on the
 screen," because that would depend on the viewer.
 
-![World-space direction convention for arrows on dice faces](../assets/dice_arrow_world_directions.png)
+![World-space direction convention for arrows on dice faces](https://m1une.github.io/m1une_library/assets/dice_arrow_world_directions.png)
 
 In the diagram, the arrow on the top face points north, the arrow on the west
 face points south, and the arrow on the south face points upward (`top`). Each

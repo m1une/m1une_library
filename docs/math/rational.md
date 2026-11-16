@@ -7,7 +7,7 @@ documentation_of: ../../math/rational.hpp
 
 `Rational<T>` represents an exact fraction using either a signed built-in
 integral type or an integer-like class such as
-[`utilities::BigInt`](../utilities/bigint.md).
+[`utilities::BigInt`](https://m1une.github.io/m1une_library/utilities/bigint.hpp).
 
 Every value is normalized:
 
@@ -90,7 +90,7 @@ Point scaled = a * Fraction(2, 3);                   // (1/3, 0)
 Geometry preserves rational arithmetic for dot/cross products, squared
 distances, areas returned by `polygon_area2` and `rectangle_union_area`, and
 exact predicates. Functions returning `long double` or `Point<long double>`
-produce approximations. See [point types and predicates](../geometry/point.md).
+produce approximations. See [point types and predicates](https://m1une.github.io/m1une_library/geometry/point.hpp).
 
 `template <std::floating_point F> explicit operator F() const` supports explicit
 conversion to `float`, `double`, or `long double`, with the same complexity as

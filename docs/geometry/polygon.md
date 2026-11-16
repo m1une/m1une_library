@@ -183,7 +183,7 @@ an isolated contact such as a tangency. A degenerate segment returns `[0, 0]`
 exactly when its point belongs to the selected polygon set.
 
 Circle results use the `AngularCoverage` representation documented in
-[`geometry/circle.hpp`](circle.md): `Point` denotes an isolated contact, `Arc`
+[`geometry/circle.hpp`](https://m1une.github.io/m1une_library/geometry/circle.hpp): `Point` denotes an isolated contact, `Arc`
 denotes a counterclockwise interval, and `Full` denotes the complete
 circumference. Results are sorted by normalized `begin`; a wrapping arc has an
 `end` greater than $2\pi$. An empty vector denotes empty clipping.
@@ -263,10 +263,10 @@ polygons, in clockwise or counterclockwise order.
 
 For optimized containment, cuts, diameter, intersection construction,
 Minkowski sums, and other convex-only operations, include
-[`geometry/convex_polygon.hpp`](convex_polygon.md).
+[`geometry/convex_polygon.hpp`](https://m1une.github.io/m1une_library/geometry/convex_polygon.hpp).
 
 To partition a simple polygon into convex pieces, include
-[`geometry/convex_decomposition.hpp`](convex_decomposition.md). It provides a
+[`geometry/convex_decomposition.hpp`](https://m1une.github.io/m1une_library/geometry/convex_decomposition.hpp). It provides a
 fast exact partition with a four-approximation guarantee on the piece count,
 and an exact minimum-piece dynamic program.
 

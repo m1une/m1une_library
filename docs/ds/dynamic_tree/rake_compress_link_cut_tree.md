@@ -51,7 +51,7 @@ using EdgeValue = ...;
 
 These types separate local original-tree data from the two aggregate levels:
 
-![Relationship between original-tree values, Point, and Path](../assets/rake_compress_link_cut_tree_types.png)
+![Relationship between original-tree values, Point, and Path](https://m1une.github.io/m1une_library/assets/rake_compress_link_cut_tree_types.png)
 
 The four panels show the operations on explicit before-and-after tree
 drawings. `rake` merges independent virtual branches at the same attachment

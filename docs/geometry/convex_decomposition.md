@@ -32,7 +32,7 @@ input vertex, apart from removing redundant boundary vertices. This restriction
 is important when interpreting the piece-count guarantee and the word
 "minimum." For a floating-point decomposition that may introduce Steiner
 vertices and guarantees fewer than twice the unrestricted optimum, see
-[`steiner_convex_decomposition`](steiner_convex_decomposition.md).
+[`steiner_convex_decomposition`](https://m1une.github.io/m1une_library/geometry/steiner_convex_decomposition.hpp).
 
 ## Functions
 
@@ -102,8 +102,8 @@ projective visibility predicates and rational ray-intersection comparisons:
 | Largest coordinate magnitude | Predicate type |
 | --- | --- |
 | Fewer than $2^{30}$ | built-in `__int128_t` |
-| Fewer than $2^{62}$ | [`Int256`](../utilities/int256.md) |
-| Otherwise | [`Int512`](../utilities/int512.md) |
+| Fewer than $2^{62}$ | [`Int256`](https://m1une.github.io/m1une_library/utilities/int256.hpp) |
+| Otherwise | [`Int512`](https://m1une.github.io/m1une_library/utilities/int512.hpp) |
 
 The largest intermediate has magnitude below $2^{4k+6}$ when coordinate
 magnitudes use at most $k$ bits. Thus full-range 32-bit coordinates are not

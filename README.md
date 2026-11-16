@@ -4,6 +4,11 @@
 
 C++20 library for competitive programming by [m1une](https://atcoder.jp/users/m1une).
 
+Released under [CC0 1.0 Universal](LICENSE). Anyone may use, copy, modify, and
+redistribute the library and its documentation for any purpose, including
+commercial use, without permission or attribution. No copyright or license
+notice needs to be retained. Provided as-is, without warranty.
+
 This repository is organized as header-only building blocks. Convex tools such
 as Li Chao tree, CHT, slope trick, Alien Trick, and Monge optimizations live
 under `convex/`. Use `ds/` for non-convex stateful query/update objects, and

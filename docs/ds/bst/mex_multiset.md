@@ -7,7 +7,7 @@ documentation_of: ../../../ds/bst/mex_multiset.hpp
 
 `MexMultiset` maintains multiplicities of integers in a fixed universe `[0, U)`
 and answers mex queries in constant time. It stores counts and uses a
-[`PredecessorSet`](predecessor_set.md) to find the first missing value after
+[`PredecessorSet`](https://m1une.github.io/m1une_library/ds/bst/predecessor_set.hpp) to find the first missing value after
 updates, with deterministic bounds and $O(U)$ space.
 
 ## Behavior

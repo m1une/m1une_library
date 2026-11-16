@@ -227,7 +227,7 @@ seg.set(x, y, current + delta);
 ```
 
 For rectangle updates and point queries, use
-[`DualSegtree2D`](dual_segtree_2d.md).
+[`DualSegtree2D`](https://m1une.github.io/m1une_library/ds/segtree/dual_segtree_2d.hpp).
 
 Although the template only requires a monoid, rectangle aggregation is usually intended for commutative monoids such as sum, min, max, and gcd.
 For non-commutative monoids, the result follows the internal traversal order and may not match a natural geometric interpretation.

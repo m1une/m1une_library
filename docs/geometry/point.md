@@ -14,7 +14,7 @@ orientation calculations use signed 128-bit arithmetic. For floating-point
 coordinates, predicates use `long double` and accept a scale-aware epsilon.
 
 `Coordinate<T>` also accepts exact numeric classes such as
-[`math::Rational`](../math/rational.md), including `Rational<utilities::BigInt>`.
+[`math::Rational`](https://m1une.github.io/m1une_library/math/rational.hpp), including `Rational<utilities::BigInt>`.
 A custom coordinate type must be copyable, totally ordered, constructible from
 `0` and `1`, support unary signs and closed `+`, `-`, `*`, `/`, `+=`, and `-=`,
 and provide an explicit conversion to `long double`. Its arithmetic and ordering
