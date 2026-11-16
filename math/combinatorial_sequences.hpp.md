@@ -1194,7 +1194,7 @@ $$
 = \sum_{n=0}^{\infty}\frac{x^n}{(n+1)!}.
 $$
 
-The function is defined in [`math/bernoulli.hpp`](bernoulli.md), which also
+The function is defined in [`math/bernoulli.hpp`](https://m1une.github.io/m1une_library/math/bernoulli.hpp), which also
 provides Bernoulli polynomials, power sums, and polynomial discrete
 integration. It remains available through this header for compatibility.
 

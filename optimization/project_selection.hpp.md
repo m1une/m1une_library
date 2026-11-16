@@ -407,7 +407,7 @@ This is substantially faster and more predictable than a general integer
 programming solver for objectives that fit the supported forms.
 
 For ordered variables with more than two choices and supermodular pairwise gain
-tables, use [`KProjectSelection<T>`](k_project_selection.md).
+tables, use [`KProjectSelection<T>`](https://m1une.github.io/m1une_library/optimization/k_project_selection.hpp).
 
 Project `i` is **selected** when `result.selected[i]` is true. Gains increase the
 objective and penalties decrease it. A cost of `c` for selecting project `i`

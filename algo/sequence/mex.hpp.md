@@ -77,7 +77,7 @@ and values at least `N` do not affect the answer. The result is always in `[0, N
 The implementation uses a byte per candidate and does not sort the input.
 
 For repeated queries with insertions and deletions, use
-[`MexMultiset`](../../ds/bst/mex_multiset.md).
+[`MexMultiset`](https://m1une.github.io/m1une_library/ds/bst/mex_multiset.hpp).
 
 ## Example
 

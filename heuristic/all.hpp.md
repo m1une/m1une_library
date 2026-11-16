@@ -220,18 +220,18 @@ like a branching decision tree rather than repeated modification of one state.
 - `Objective::minimize` means smaller scores are better.
 - `delta` always means `candidate_score - current_score`, even when minimizing.
 
-[`utilities/Timer`](../utilities/timer.md) and
-[`utilities/Random`](../utilities/random.md) provide the usual time limit and
+[`utilities/Timer`](https://m1une.github.io/m1une_library/utilities/timer.hpp) and
+[`utilities/Random`](https://m1une.github.io/m1une_library/utilities/random.hpp) provide the usual time limit and
 randomness for local search.
 
 ## Included Headers
 
 | Header | Contents |
 | --- | --- |
-| [`heuristic/objective.hpp`](objective.md) | Shared minimization/maximization score ordering. |
-| [`heuristic/hill_climbing.hpp`](hill_climbing.md) | Greedy local-search acceptance with optional equal-score moves. |
-| [`heuristic/simulated_annealing.hpp`](simulated_annealing.md) | Temperature schedules and probabilistic acceptance. |
-| [`heuristic/beam_search.hpp`](beam_search.md) | Memory-bounded layered search with simple and allocation-conscious child generation. |
+| [`heuristic/objective.hpp`](https://m1une.github.io/m1une_library/heuristic/objective.hpp) | Shared minimization/maximization score ordering. |
+| [`heuristic/hill_climbing.hpp`](https://m1une.github.io/m1une_library/heuristic/hill_climbing.hpp) | Greedy local-search acceptance with optional equal-score moves. |
+| [`heuristic/simulated_annealing.hpp`](https://m1une.github.io/m1une_library/heuristic/simulated_annealing.hpp) | Temperature schedules and probabilistic acceptance. |
+| [`heuristic/beam_search.hpp`](https://m1une.github.io/m1une_library/heuristic/beam_search.hpp) | Memory-bounded layered search with simple and allocation-conscious child generation. |
 
 Include `heuristic/all.hpp` to use every heuristic header, or include only the
 specific header needed by the solution.

@@ -2603,7 +2603,7 @@ minimum possible number of pieces.
 This is not a minimum-cardinality routine. In particular, it does not implement
 the much more involved X/Y-pattern dynamic program required for the optimal
 $O(N+R^3)$ Chazelle--Dobkin algorithm. Use
-[`minimum_convex_decomposition`](convex_decomposition.md) when minimum
+[`minimum_convex_decomposition`](https://m1une.github.io/m1une_library/geometry/convex_decomposition.hpp) when minimum
 cardinality is required and Steiner points are forbidden.
 
 ## Input and output rules

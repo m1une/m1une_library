@@ -58,13 +58,39 @@ Liquid syntax is active while pages are generated. Do not introduce two
 consecutive opening braces in Markdown examples, public headers, or verification
 sources that may be rendered by verification-helper.
 
+The generated site's top page comes from `.verify-helper/docs/index.md`.
+The root `README.md` is the GitHub repository landing page, not the generated
+site's top page. Repository README files may use relative links to source
+Markdown files and directories; validate those links relative to the README's
+location on GitHub.
+
 Verification-helper relocates a Markdown page with `documentation_of` to the
 documented header's path: for example, `docs/convex/monge/smawk.md` is published
 at `https://m1une.github.io/m1une_library/convex/monge/smawk.hpp`. It does not
 rewrite relative links in the page body. When linking between these pages, use
 their full published URLs so the links work both on GitHub and on the generated
-site. Validate targets against the generated page paths, not just the source
-Markdown files.
+site. This applies to links inside `docs/` and the generated site's
+`.verify-helper/docs/index.md`. In these pages, never link to a documentation
+source `.md` file or merely replace a relative `.md` suffix with `.hpp`:
+resolve the target page's `documentation_of` value
+and use that header's repository-root path after
+`https://m1une.github.io/m1une_library/`. Preserve any `#section` fragment and
+check that the target heading exists.
+
+For example, the link from `docs/algo/sequence/mex.md` to the mex multiset
+documentation must use
+`https://m1une.github.io/m1une_library/ds/bst/mex_multiset.hpp`, not
+`../../ds/bst/mex_multiset.md`. Images must use their full published
+`https://m1une.github.io/m1une_library/assets/...` URLs and have a matching file
+under `.verify-helper/docs/static/assets/`. When linking from generated pages
+to source directories or README files, use full GitHub `tree/main/...` or
+`blob/main/...` URLs instead of relative links that break on the generated site.
+
+Before finishing documentation changes, audit Markdown links, reference-style
+links, HTML links, and image destinations across the repository. Validate them
+against the paths generated from `documentation_of` and the published static
+assets, not just the source Markdown files; confirm generated pages have no
+relative documentation `.md` links or published-site URLs ending in `.md`.
 
 In C++ examples and source listings, prefer brace elision, explicit default
 initialization plus assignments, `emplace_back`, or named expected values instead
