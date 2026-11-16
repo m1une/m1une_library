@@ -20,6 +20,6 @@ If a header builds an object and then answers repeated queries, it belongs in
 | --- | --- |
 | `algo/sequence/all.hpp` | Sequence and array algorithms such as LIS, inversion count, non-adjacent selection, run-length encoding, and subset sum. |
 | `algo/search/all.hpp` | Search-over-answer and unimodal optimization helpers. |
-| `algo/offline/all.hpp` | Offline query processing such as Mo's algorithm. |
+| `algo/offline/all.hpp` | Static Mo and Mo with point updates, CDQ divide-and-conquer, and parallel binary search. |
 | `algo/enumeration/all.hpp` | Combinatorial traversal helpers such as Gray-code enumeration. |
 | `algo/dp/all.hpp` | Domain-neutral DP helpers such as knapsack routines. |

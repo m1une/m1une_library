@@ -16,6 +16,9 @@ Use it when:
 
 ## Basic API
 
+For range queries interleaved with point updates, use
+[MoWithUpdates](https://m1une.github.io/m1une_library/algo/offline/mo_with_updates.hpp).
+
 ```cpp
 m1une::algo::Mo mo(n);
 int id = mo.add_query(left, right);

@@ -3,6 +3,7 @@
 
 #include "cdq_divide_and_conquer.hpp"
 #include "mo.hpp"
+#include "mo_with_updates.hpp"
 #include "parallel_binary_search.hpp"
 
 #endif  // M1UNE_ALGO_OFFLINE_ALL_HPP
